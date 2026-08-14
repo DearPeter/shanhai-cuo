@@ -570,7 +570,7 @@ body.size-sm h2.chapter-h { font-size: 26px; }
   <div class="progress-wrap" title="点击跳转">
     <div class="progress-fill" id="top-fill"></div>
   </div>
-  <div class="progress-time"><span class="ch-label" id="ch-label">第1章</span>· <span id="cur-time">0:00</span> / <span id="dur-time">--:--</span></div>
+  <div class="progress-time"><span class="ch-label" id="ch-label">载入中…</span>· <span id="cur-time">0:00</span> / <span id="dur-time">--:--</span></div>
   <button id="size-btn" class="icon-btn" aria-label="字号">
     <svg viewBox="0 0 24 24" fill="currentColor"><path d="M9 4v3h5v12h3V7h5V4H9zm-6 8h3v7h3v-7h3V9H3v3z"/></svg>
   </button>
@@ -5811,24 +5811,24 @@ body.size-sm h2.chapter-h { font-size: 26px; }
   </div>
   <div class="player-extra">
     <select id="chapter-select" class="chapter-select" aria-label="选择章节">
-      <option value="1">第01章 · 17:28</option>
-<option value="2">第02章 · 8:22</option>
-<option value="3">第03章 · 7:31</option>
-<option value="4">第04章 · 7:17</option>
-<option value="5">第05章 · 16:28</option>
-<option value="6">第06章 · 19:49</option>
-<option value="7">第07章 · 8:51</option>
-<option value="8">第08章 · 13:10</option>
-<option value="9">第09章 · 13:28</option>
-<option value="10">第10章 · 15:32</option>
-<option value="11">第11章 · 2:26</option>
-<option value="12">第12章 · 3:15</option>
-<option value="13">第13章 · 5:42</option>
-<option value="14">第14章 · 9:10</option>
-<option value="15">第15章 · 1:37</option>
-<option value="16">第16章 · 3:37</option>
-<option value="17">第17章 · 5:36</option>
-<option value="18">第18章 · 4:49</option>
+      <option value="1">第一章 山上的人 · 17:28</option>
+      <option value="2">第二章 下山 · 8:22</option>
+      <option value="3">第三章 山海图 · 7:31</option>
+      <option value="4">第四章 山下 · 7:17</option>
+      <option value="5">第五章 云台 · 16:28</option>
+      <option value="6">第六章 县衙 · 19:49</option>
+      <option value="7">第七章 回山 · 8:51</option>
+      <option value="8">第八章 三年后 · 13:10</option>
+      <option value="9">第九章 山下十年 · 13:28</option>
+      <option value="10">第十章 山海图 · 15:32</option>
+      <option value="11">尾声 · 2:26</option>
+      <option value="12">后记 · 3:15</option>
+      <option value="13">主外·听雪剑门小记 · 5:42</option>
+      <option value="14">主外·听雪剑门人物志 · 9:10</option>
+      <option value="15">主外·公孙大娘他爹——公孙不喝 · 1:37</option>
+      <option value="16">主外·梅也 · 3:37</option>
+      <option value="17">主外·不图 · 5:36</option>
+      <option value="18">主外·本篇之后，还有后续 · 4:49</option>
     </select>
     <select id="speed" class="speed-select" aria-label="播放速度">
       <option value="0.8">0.8×</option>
@@ -6066,9 +6066,15 @@ body.size-sm h2.chapter-h { font-size: 26px; }
     const titleEl = document.querySelector('.player-now .title');
     if (titleEl) titleEl.textContent = title;
     if (chLabel) {
-      // 顶栏短一点：第一章/第二章 ...
-      const m = title.match(/第[一二三四五六七八九十百千零〇\d]+章/);
-      chLabel.textContent = m ? m[0] : title;
+      // 顶栏短一点：优先显示 dropdown 同款短标签
+      // 先看 select option
+      const opt = chSel && chSel.querySelector(`option[value="${ch}"]`);
+      let lbl = opt ? opt.textContent : title;
+      // 去掉最后 " · 时长" 部分
+      lbl = lbl.replace(/\s*·\s*\d+:\d+\s*$/, '');
+      // 如果太长 (>14 字) 就截断
+      if (lbl.length > 14) lbl = lbl.slice(0, 13) + '…';
+      chLabel.textContent = lbl;
     }
     if (chSel) chSel.value = String(ch);
 
