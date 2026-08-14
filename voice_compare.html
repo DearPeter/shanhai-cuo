@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>声音挑选 · 山海错</title>
+<style>
+:root {
+  --bg: #f6efdf;
+  --paper: #fbf6e9;
+  --ink: #1f1a14;
+  --ink-soft: #5e5243;
+  --accent: #a93226;
+  --rule: #d4c8a8;
+  --serif: "Source Han Serif SC", "Songti SC", "STSong", serif;
+  --sans: "PingFang SC", system-ui, sans-serif;
+}
+* { box-sizing: border-box; }
+html, body {
+  margin: 0; padding: 0; background: var(--bg); color: var(--ink);
+  font-family: var(--serif); line-height: 1.8;
+}
+.wrap { max-width: 760px; margin: 0 auto; padding: 40px 24px 100px; background: var(--paper); min-height: 100vh; box-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 12px 32px rgba(0,0,0,0.08);}
+h1 { font-size: 32px; letter-spacing: 0.08em; margin: 0 0 12px; }
+.sub { color: var(--ink-soft); font-family: var(--sans); font-size: 13px; margin: 0 0 28px; }
+.row {
+  display: flex; align-items: center; gap: 16px;
+  padding: 14px 16px;
+  border-bottom: 1px dashed var(--rule);
+}
+.row:last-child { border-bottom: none; }
+.meta { display: flex; align-items: center; gap: 12px; min-width: 200px; }
+.badge {
+  background: var(--accent); color: #fff;
+  border-radius: 4px; padding: 2px 6px;
+  font-family: var(--sans); font-size: 11px;
+  font-variant-numeric: tabular-nums;
+}
+.title { font-size: 16px; }
+audio { flex: 1; max-width: 360px; height: 32px; }
+.pick {
+  display: inline-block; padding: 6px 14px;
+  border: 1px solid var(--accent); border-radius: 4px;
+  background: transparent; color: var(--accent);
+  font-family: var(--sans); font-size: 12px;
+  cursor: pointer; margin-left: 8px;
+}
+.pick:hover { background: var(--accent); color: #fff; }
+.intro {
+  margin: 0 0 24px; padding: 16px;
+  background: rgba(169,50,38,0.06);
+  border-left: 3px solid var(--accent);
+  border-radius: 4px;
+  font-size: 14px; color: var(--ink-soft);
+}
+.back-link { display: inline-block; margin-bottom: 20px; font-family: var(--sans); font-size: 13px; color: var(--accent); }
+audio::-webkit-media-controls-panel { background: var(--paper); }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a href="index.html" class="back-link">← 回到《山海错》</a>
+  <h1>🎙️ 声音挑选</h1>
+  <p class="sub">18 种 voice，每个 ~12 秒，对照听选最适合《山海错》的声音</p>
+
+  <p class="intro">
+    同一段话："我叫方无咎……剑在酒馆里舞剑。" 共 18 个不同 voice。
+    <br>
+    听完告诉我哪个最适合（或者把两个声都想要做成"对话式旁白"也可）。
+  </p>
+
+<div class="row"><div class="meta"><span class="badge">#00</span><div class="title"></div></div><audio controls preload="metadata" src="audio/voice_compare/v00_audiobook_male_1.mp3"></audio></div>
+<div class="row"><div class="meta"><span class="badge">#00</span><div class="title"></div></div><audio controls preload="metadata" src="audio/voice_compare/v0_audiobook_male_1.mp3"></audio></div>
+<div class="row"><div class="meta"><span class="badge">#01</span><div class="title">Chinese Mandarin Humorous Elder</div></div><audio controls preload="metadata" src="audio/voice_compare/v01_Chinese_Mandarin_Humorous_Elder.mp3"></audio></div>
+<div class="row"><div class="meta"><span class="badge">#02</span><div class="title">Chinese Mandarin News Anchor</div></div><audio controls preload="metadata" src="audio/voice_compare/v02_Chinese_Mandarin_News_Anchor.mp3"></audio></div>
+<div class="row"><div class="meta"><span class="badge">#03</span><div class="title">Chinese Mandarin Sincere Adult</div></div><audio controls preload="metadata" src="audio/voice_compare/v03_Chinese_Mandarin_Sincere_Adult.mp3"></audio></div>
+<div class="row"><div class="meta"><span class="badge">#04</span><div class="title">Chinese Mandarin Gentleman</div></div><audio controls preload="metadata" src="audio/voice_compare/v04_Chinese_Mandarin_Gentleman.mp3"></audio></div>
+<div class="row"><div class="meta"><span class="badge">#05</span><div class="title">Chinese Mandarin Mature Woman</div></div><audio controls preload="metadata" src="audio/voice_compare/v05_Chinese_Mandarin_Mature_Woman.mp3"></audio></div>
+<div class="row"><div class="meta"><span class="badge">#06</span><div class="title">Chinese Mandarin Radio Host</div></div><audio controls preload="metadata" src="audio/voice_compare/v06_Chinese_Mandarin_Radio_Host.mp3"></audio></div>
+<div class="row"><div class="meta"><span class="badge">#07</span><div class="title">Chinese Mandarin Pure-hearted Boy</div></div><audio controls preload="metadata" src="audio/voice_compare/v07_Chinese_Mandarin_Pure-hearted_Boy.mp3"></audio></div>
+<div class="row"><div class="meta"><span class="badge">#08</span><div class="title">Chinese Mandarin HK Flight Attendant</div></div><audio controls preload="metadata" src="audio/voice_compare/v08_Chinese_Mandarin_HK_Flight_Attendant.mp3"></audio></div>
+<div class="row"><div class="meta"><span class="badge">#09</span><div class="title">Chinese Mandarin Southern Young Man</div></div><audio controls preload="metadata" src="audio/voice_compare/v09_Chinese_Mandarin_Southern_Young_Man.mp3"></audio></div>
+<div class="row"><div class="meta"><span class="badge">#10</span><div class="title">-yujie</div></div><audio controls preload="metadata" src="audio/voice_compare/v10_female-yujie.mp3"></audio></div>
+<div class="row"><div class="meta"><span class="badge">#11</span><div class="title">-chengshu</div></div><audio controls preload="metadata" src="audio/voice_compare/v11_female-chengshu.mp3"></audio></div>
+<div class="row"><div class="meta"><span class="badge">#12</span><div class="title">-qn-qingse</div></div><audio controls preload="metadata" src="audio/voice_compare/v12_male-qn-qingse.mp3"></audio></div>
+<div class="row"><div class="meta"><span class="badge">#13</span><div class="title">-qn-badao</div></div><audio controls preload="metadata" src="audio/voice_compare/v13_male-qn-badao.mp3"></audio></div>
+<div class="row"><div class="meta"><span class="badge">#14</span><div class="title">-qn-daxuesheng</div></div><audio controls preload="metadata" src="audio/voice_compare/v14_male-qn-daxuesheng.mp3"></audio></div>
+<div class="row"><div class="meta"><span class="badge">#15</span><div class="title"></div></div><audio controls preload="metadata" src="audio/voice_compare/v15_presenter_male.mp3"></audio></div>
+<div class="row"><div class="meta"><span class="badge">#16</span><div class="title">Chinese Mandarin Humorous Elder</div></div><audio controls preload="metadata" src="audio/voice_compare/v16_Chinese_Mandarin_Humorous_Elder.mp3"></audio></div>
+
+  <p style="margin-top:32px; font-size:13px; color:var(--ink-soft); font-family:var(--sans);">
+    💡 提示：点击播放按钮即可。也可以在桌面多个 audio 上同时点开对比。
+  </p>
+</div>
+</body>
+</html>
