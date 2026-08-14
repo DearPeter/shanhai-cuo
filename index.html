@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>山海错</title>
 <meta name="description" content="一部仿韩寒《长安乱》风格的中篇武侠小说">
+<link rel="preload" href="audio/ch1.mp3" as="audio">
 <style>
 :root {
   --bg: #f7f3eb;
@@ -206,6 +207,42 @@ body.dark {
 }
 
 /* ---------- 端 ---------- */
+.audio-player {
+  background: rgba(139, 58, 42, 0.06);
+  border: 1px solid var(--rule);
+  border-radius: 8px;
+  padding: 24px 28px;
+  margin: 40px 0;
+  text-align: center;
+}
+.audio-player h3 {
+  color: var(--accent);
+  margin: 0 0 8px;
+  font-size: 20px;
+}
+.audio-player .player-meta {
+  font-size: 14px;
+  color: var(--ink-soft);
+  text-indent: 0;
+  margin: 0 0 16px;
+}
+.audio-player audio {
+  width: 100%;
+  margin: 16px 0 8px;
+}
+.audio-player .player-tip {
+  font-size: 13px;
+  color: var(--ink-soft);
+  text-indent: 0;
+  margin: 8px 0 0;
+  line-height: 1.6;
+}
+
+body.dark .audio-player {
+  background: rgba(212, 135, 111, 0.08);
+  border-color: #4a3a2a;
+}
+
 .colophon {
   margin-top: 80px;
   padding-top: 30px;
@@ -5424,6 +5461,20 @@ body.dark {
 <p>山海错不图一辈子。</p>
 <p>山海错——</p>
 <p>——嗯。</p>
+<hr/>
+<section class="audio-player">
+  <h3>🎧 听书 · 第一章《山上的人》</h3>
+  <p class="player-meta">约 14 分钟 · 由 MiniMax speech-2.8-hd 朗读 · 男声 male-qn-jingying</p>
+  <audio id="ch1-audio" controls preload="metadata" src="audio/ch1.mp3">
+    你的浏览器不支持 audio 标签。下载：<a href="audio/ch1.mp3">audio/ch1.mp3</a>
+  </audio>
+  <p class="player-tip">
+    💡 提示：可以一边看正文一边听；第一章正文中包含全部内容，从"我是被师父从山下捡回来的"开始。
+  </p>
+  <p class="player-tip">
+    <a href="audio/ch1.txt">下载第一章原文</a>
+  </p>
+</section>
 <hr/>
 <p><em>（全书终）</em></p>
 <div class="colophon">
