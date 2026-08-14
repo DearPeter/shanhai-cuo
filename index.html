@@ -96,9 +96,10 @@ html.dark .topbar { background: rgba(20, 17, 11, 0.86); }
 .progress-time {
   font-family: var(--sans); font-size: 12px;
   color: var(--ink-soft);
-  min-width: 96px; text-align: center;
+  min-width: 110px; text-align: center;
   font-variant-numeric: tabular-nums;
 }
+.progress-time .ch-label { color: var(--ink-faint); margin-right: 6px; }
 .icon-btn {
   background: transparent;
   border: 1px solid var(--rule);
@@ -160,6 +161,7 @@ html.dark .topbar { background: rgba(20, 17, 11, 0.86); }
 }
 .sidebar-toc li a:hover { background: var(--highlight); color: var(--accent); }
 .sidebar-toc li a.active { background: var(--highlight-strong); color: var(--accent); font-weight: 600; }
+.sidebar-toc li a .toc-mic { font-size: 11px; opacity: 0.7; margin-left: auto; }
 .toc-num { font-variant-numeric: tabular-nums; font-size: 11px; color: var(--ink-faint); min-width: 22px; }
 .sidebar-toc .toc-title { flex: 1; }
 .sidebar-toc::-webkit-scrollbar { width: 4px; }
@@ -247,6 +249,19 @@ main.article h2.chapter-h::before {
   vertical-align: 3px;
   border-radius: 2px;
 }
+main.article h2.chapter-h[data-audio="1"]::after {
+  content: '🔊 本章有朗读';
+  font-family: var(--sans);
+  font-size: 11px;
+  margin-left: 12px;
+  vertical-align: middle;
+  background: var(--highlight-strong);
+  color: var(--accent);
+  padding: 4px 10px;
+  border-radius: 999px;
+  letter-spacing: 0.05em;
+  font-weight: 400;
+}
 main.article h3 {
   font-size: 20px;
   margin: 36px 0 12px;
@@ -272,7 +287,7 @@ main.article p {
   border-radius: 4px;
   transition: background 0.45s ease, color 0.45s ease;
 }
-main.article p[data-t] { scroll-margin-top: 120px; }
+main.article p[data-t] { scroll-margin-top: 120px; cursor: pointer; }
 main.article p.reading { background: var(--highlight-strong); }
 main.article p.spoken { background: var(--highlight); }
 main.article hr {
@@ -417,7 +432,7 @@ html.dark .player { background: rgba(20, 17, 11, 0.96); }
 .player-quote::after { content: "」"; color: var(--accent); margin-left: 2px; }
 
 .player-extra { display: flex; gap: 6px; align-items: center; flex-shrink: 0; }
-.speed-select {
+.speed-select, .chapter-select {
   font-family: var(--sans); font-size: 12px;
   border: 1px solid var(--rule);
   background: transparent; color: var(--ink-soft);
@@ -469,6 +484,7 @@ body.size-sm h2.chapter-h { font-size: 26px; }
   main.article { padding: 36px 24px 60px; }
   .menu-btn { display: inline-flex; }
   .progress-wrap { max-width: none; }
+  .progress-time { min-width: auto; }
 
   .scrim {
     position: fixed; inset: 60px 0 110px 0;
@@ -510,6 +526,7 @@ body.size-sm h2.chapter-h { font-size: 26px; }
     font-size: 14px;
   }
   .drawer .toc-num { color: var(--ink-faint); }
+  .drawer .toc-mic { margin-left: auto; opacity: 0.7; font-size: 11px; }
 }
 
 @media (max-width: 640px) {
@@ -517,17 +534,18 @@ body.size-sm h2.chapter-h { font-size: 26px; }
   main.article { padding: 28px 18px 60px; }
   main.article h1 { font-size: 36px; letter-spacing: 0.05em; }
   h2.chapter-h { font-size: 22px !important; }
+  h2.chapter-h[data-audio="1"]::after { display: block; margin-left: 0; margin-top: 6px; width: max-content; }
   main.article p { text-indent: 2em; padding: 4px 0; margin-left: 0; margin-right: 0; }
   .topbar { padding: 0 12px; gap: 8px; height: 56px; }
   .topbar .brand { font-size: 16px; }
   .topbar .brand small { display: none; }
   .topbar-spacer { display: none; }
   .progress-wrap { flex: 1; }
-  .progress-time { display: none; }
+  .progress-time { font-size: 11px; }
   .player { padding: 10px 12px 12px; gap: 8px; height: 100px; }
   .player-info { gap: 4px; }
   .player-quote { display: none; }
-  .speed-select { display: none; }
+  .speed-select, .chapter-select { display: none; }
   .chapter-meta-bar { flex-direction: column; gap: 8px; align-items: flex-start; }
   .hero h1 { font-size: 32px !important; }
   .hero h1::before, .hero h1::after { width: 16px; margin: 0 8px; }
@@ -552,7 +570,7 @@ body.size-sm h2.chapter-h { font-size: 26px; }
   <div class="progress-wrap" title="点击跳转">
     <div class="progress-fill" id="top-fill"></div>
   </div>
-  <div class="progress-time"><span id="cur-time">0:00</span> / <span id="dur-time">--:--</span></div>
+  <div class="progress-time"><span class="ch-label" id="ch-label">第1章</span>· <span id="cur-time">0:00</span> / <span id="dur-time">--:--</span></div>
   <button id="size-btn" class="icon-btn" aria-label="字号">
     <svg viewBox="0 0 24 24" fill="currentColor"><path d="M9 4v3h5v12h3V7h5V4H9zm-6 8h3v7h3v-7h3V9H3v3z"/></svg>
   </button>
@@ -563,48 +581,18 @@ body.size-sm h2.chapter-h { font-size: 26px; }
 
 <div class="layout">
 
-  <nav class="sidebar-toc" aria-label="章节目录"><h3>目录 · 31 章</h3><ol><li><a href="#序"><span class="toc-num">01</span><span class="toc-title">序</span></a></li>
-<li><a href="#第一章-山上的人"><span class="toc-num">02</span><span class="toc-title">第一章 山上的人</span></a></li>
-<li><a href="#第二章-下山"><span class="toc-num">03</span><span class="toc-title">第二章 下山</span></a></li>
-<li><a href="#第三章-山海图"><span class="toc-num">04</span><span class="toc-title">第三章 山海图</span></a></li>
-<li><a href="#第四章-山下"><span class="toc-num">05</span><span class="toc-title">第四章 山下</span></a></li>
-<li><a href="#第五章-云台"><span class="toc-num">06</span><span class="toc-title">第五章 云台</span></a></li>
-<li><a href="#第六章-县衙"><span class="toc-num">07</span><span class="toc-title">第六章 县衙</span></a></li>
-<li><a href="#第七章-回山"><span class="toc-num">08</span><span class="toc-title">第七章 回山</span></a></li>
-<li><a href="#第八章-三年后"><span class="toc-num">09</span><span class="toc-title">第八章 三年后</span></a></li>
-<li><a href="#第九章-山下十年"><span class="toc-num">10</span><span class="toc-title">第九章 山下十年</span></a></li>
-<li><a href="#第十章-山海图"><span class="toc-num">11</span><span class="toc-title">第十章 山海图</span></a></li>
-<li><a href="#尾声"><span class="toc-num">12</span><span class="toc-title">尾声</span></a></li>
-<li><a href="#后记"><span class="toc-num">13</span><span class="toc-title">后记</span></a></li>
-<li><a href="#附录：听雪剑门小记"><span class="toc-num">14</span><span class="toc-title">附录：听雪剑门小记</span></a></li>
-<li><a href="#再附录：听雪剑门人物志"><span class="toc-num">15</span><span class="toc-title">再附录：听雪剑门人物志</span></a></li>
-<li><a href="#八、-公孙大娘他爹——公孙不喝"><span class="toc-num">16</span><span class="toc-title">八、 公孙大娘他爹——公孙不喝</span></a></li>
-<li><a href="#九、-梅也"><span class="toc-num">17</span><span class="toc-title">九、 梅也</span></a></li>
-<li><a href="#十、-不图"><span class="toc-num">18</span><span class="toc-title">十、 不图</span></a></li>
-<li><a href="#附录：本篇之后，还有后续"><span class="toc-num">19</span><span class="toc-title">附录：本篇之后，还有后续</span></a></li>
-<li><a href="#山海错·卷二：天下入山"><span class="toc-num">20</span><span class="toc-title">山海错·卷二：天下入山</span></a></li>
-<li><a href="#附录：方无咎后传·听雪剑门第二十代"><span class="toc-num">21</span><span class="toc-title">附录：方无咎后传·听雪剑门第二十代</span></a></li>
-<li><a href="#附录：方无咎后传·听雪剑门第二十一代"><span class="toc-num">22</span><span class="toc-title">附录：方无咎后传·听雪剑门第二十一代</span></a></li>
-<li><a href="#附录二：豆腐巷新事"><span class="toc-num">23</span><span class="toc-title">附录二：豆腐巷新事</span></a></li>
-<li><a href="#跋：方无咎死后"><span class="toc-num">24</span><span class="toc-title">跋：方无咎死后</span></a></li>
-<li><a href="#听雪剑门编年"><span class="toc-num">25</span><span class="toc-title">听雪剑门编年</span></a></li>
-<li><a href="#听雪剑门第十九代掌门语录"><span class="toc-num">26</span><span class="toc-title">听雪剑门第十九代掌门语录</span></a></li>
-<li><a href="#关于"><span class="toc-num">27</span><span class="toc-title">关于&quot;我&quot;的一些事</span></a></li>
-<li><a href="#一段未完成的话"><span class="toc-num">28</span><span class="toc-title">一段未完成的话</span></a></li>
-<li><a href="#后跋"><span class="toc-num">29</span><span class="toc-title">后跋</span></a></li>
-<li><a href="#山海错·卷三：雪山外传"><span class="toc-num">30</span><span class="toc-title">山海错·卷三：雪山外传</span></a></li>
-<li><a href="#终跋·写在最后"><span class="toc-num">31</span><span class="toc-title">终跋·写在最后</span></a></li></ol></nav>
+  <nav class="sidebar-toc" aria-label="章节目录"><h3>目录 · 31 章</h3><ol><li><a href="#序"><span class="toc-num">01</span><span class="toc-title">序</span></a></li><li><a href="#第一章-山上的人"><span class="toc-num">02</span><span class="toc-title">第一章 山上的人</span><span class="toc-mic" title="本章有朗读">🔊</span></a></li><li><a href="#第二章-下山"><span class="toc-num">03</span><span class="toc-title">第二章 下山</span><span class="toc-mic" title="本章有朗读">🔊</span></a></li><li><a href="#第三章-山海图"><span class="toc-num">04</span><span class="toc-title">第三章 山海图</span></a></li><li><a href="#第四章-山下"><span class="toc-num">05</span><span class="toc-title">第四章 山下</span></a></li><li><a href="#第五章-云台"><span class="toc-num">06</span><span class="toc-title">第五章 云台</span></a></li><li><a href="#第六章-县衙"><span class="toc-num">07</span><span class="toc-title">第六章 县衙</span></a></li><li><a href="#第七章-回山"><span class="toc-num">08</span><span class="toc-title">第七章 回山</span></a></li><li><a href="#第八章-三年后"><span class="toc-num">09</span><span class="toc-title">第八章 三年后</span></a></li><li><a href="#第九章-山下十年"><span class="toc-num">10</span><span class="toc-title">第九章 山下十年</span></a></li><li><a href="#第十章-山海图"><span class="toc-num">11</span><span class="toc-title">第十章 山海图</span></a></li><li><a href="#尾声"><span class="toc-num">12</span><span class="toc-title">尾声</span></a></li><li><a href="#后记"><span class="toc-num">13</span><span class="toc-title">后记</span></a></li><li><a href="#附录：听雪剑门小记"><span class="toc-num">14</span><span class="toc-title">附录：听雪剑门小记</span></a></li><li><a href="#再附录：听雪剑门人物志"><span class="toc-num">15</span><span class="toc-title">再附录：听雪剑门人物志</span></a></li><li><a href="#八、-公孙大娘他爹——公孙不喝"><span class="toc-num">16</span><span class="toc-title">八、 公孙大娘他爹——公孙不喝</span></a></li><li><a href="#九、-梅也"><span class="toc-num">17</span><span class="toc-title">九、 梅也</span></a></li><li><a href="#十、-不图"><span class="toc-num">18</span><span class="toc-title">十、 不图</span></a></li><li><a href="#附录：本篇之后，还有后续"><span class="toc-num">19</span><span class="toc-title">附录：本篇之后，还有后续</span></a></li><li><a href="#山海错·卷二：天下入山"><span class="toc-num">20</span><span class="toc-title">山海错·卷二：天下入山</span></a></li><li><a href="#附录：方无咎后传·听雪剑门第二十代"><span class="toc-num">21</span><span class="toc-title">附录：方无咎后传·听雪剑门第二十代</span></a></li><li><a href="#附录：方无咎后传·听雪剑门第二十一代"><span class="toc-num">22</span><span class="toc-title">附录：方无咎后传·听雪剑门第二十一代</span></a></li><li><a href="#附录二：豆腐巷新事"><span class="toc-num">23</span><span class="toc-title">附录二：豆腐巷新事</span></a></li><li><a href="#跋：方无咎死后"><span class="toc-num">24</span><span class="toc-title">跋：方无咎死后</span></a></li><li><a href="#听雪剑门编年"><span class="toc-num">25</span><span class="toc-title">听雪剑门编年</span></a></li><li><a href="#听雪剑门第十九代掌门语录"><span class="toc-num">26</span><span class="toc-title">听雪剑门第十九代掌门语录</span></a></li><li><a href="#关于"><span class="toc-num">27</span><span class="toc-title">关于&quot;我&quot;的一些事</span></a></li><li><a href="#一段未完成的话"><span class="toc-num">28</span><span class="toc-title">一段未完成的话</span></a></li><li><a href="#后跋"><span class="toc-num">29</span><span class="toc-title">后跋</span></a></li><li><a href="#山海错·卷三：雪山外传"><span class="toc-num">30</span><span class="toc-title">山海错·卷三：雪山外传</span></a></li><li><a href="#终跋·写在最后"><span class="toc-num">31</span><span class="toc-title">终跋·写在最后</span></a></li></ol></nav>
 
   <main class="article">
     <div class="hero">
       <h1>山海错</h1>
       <p class="book-sub">仿 · 韩寒 · 长安乱 · 风格中篇</p>
       <div class="book-meta">
-        <span>全本 <strong>32</strong> 章</span>
+        <span>全本 <strong>31</strong> 章</span>
         <span>·</span>
         <span>约 <strong>10</strong> 万字</span>
         <span>·</span>
-        <span>第一章有同步朗读</span>
+        <span><strong>2</strong> 章有同步朗读</span>
       </div>
       <a href="#" class="play-cta">
         <svg viewBox="0 0 24 24" fill="currentColor" width="14" height="14"><path d="M8 5v14l11-7z"/></svg>
@@ -627,169 +615,169 @@ body.size-sm h2.chapter-h { font-size: 26px; }
 <p>而我，作为听雪剑门最不像样的一任掌门，也就莫名其妙成了这山海图的主人。</p>
 <p>但你要是读下去，你会发现我这个人，是最不可能握住任何秘密的那种人。</p>
 <hr/>
-<h2 class="chapter-h" data-chapter="1" id="第一章-山上的人">第一章 山上的人</h2>
-<p data-t="0.0" data-i="0">我是被师父从山下捡回来的。</p>
-<p data-t="2.8" data-i="1">这说法是我师父说的版本。另一个版本是我师父说的另一个版本，他说我是从天上掉下来的。听起来后者比较有来头，但前者听起来比较现实。我师父是个现实的人，他选择相信前者。</p>
-<p data-t="19.7" data-i="2">我八岁那年，师父下山去买米，看见路边一个小孩在啃树皮。他本来不想管的，他说他不是菩萨，他说他一个练剑的人看见路边有人啃树皮，多一事不如少一事。但他走了两步又回来了，因为他发现那个小孩啃树皮啃得很有章法，每一根树皮都是顺着一个方向啃的，啃出来的木屑飘落在地上，整整齐齐一排，像是用剑削出来的。</p>
-<p data-t="53.8" data-i="4">他当时很惊讶。他说他练剑二十多年，下山行走江湖几十年，没见过一个小孩子把嚼碎木屑也能吐得这么齐整。</p>
-<p data-t="64.7" data-i="5">他蹲下来问我：小孩，你饿吗。</p>
-<p data-t="68.9" data-i="6">我说饿。</p>
-<p data-t="69.9" data-i="7">他问：你爹妈呢。</p>
-<p data-t="72.3" data-i="8">我说不知道。</p>
-<p data-t="73.8" data-i="9">他问：你叫什么名字。</p>
-<p data-t="76.3" data-i="10">我说方无咎。</p>
-<p data-t="77.7" data-i="11">他愣了一下，站起来就走。走了几步又回头说：你跟我走吧。</p>
-<p data-t="84.7" data-i="12">我放下树皮，问他：你管饭吗。</p>
-<p data-t="88.3" data-i="13">他说管。</p>
-<p data-t="89.2" data-i="14">我说：那行。</p>
-<p data-t="91.0" data-i="15">就这样，我上了听雪山。</p>
-<p data-t="93.5" data-i="16">后来他告诉我，他蹲下来问我名字的时候，我报出&quot;方无咎&quot;三个字，他以为我爹是读书人，并且死前给我把这三个字教了很多遍。读书人家的小孩，父母双亡，下落不明，吃树皮吃得跟练剑一样——这种配置，在当时的江湖上大概率只有一个出处：某个刚被灭了门的门派里流落出来的小孩。</p>
-<p data-t="122.6" data-i="18">他去查过。查了三个月，没查到任何一个叫得出名字的门派在那两年被灭过门。</p>
-<p data-t="130.5" data-i="19">他说，那也行，那就不查了，反正山上缺一个扫地的。</p>
-<p data-t="137.6" data-i="20">这就是我师父。一个大智若愚的人，或者说，就是一个挺倒霉的人。</p>
-<p data-t="144.3" data-i="21">我师父叫陆青莲。</p>
-<p data-t="146.1" data-i="22">听起来像个女人，但他当时说这是按辈分取的，他上上一辈有个师祖叫陆青骢，传说是个白马银枪的少年将军，后来因为失恋躲到山上来给老观主烧火，烧了三十年，火烧得世上最好，但是再也没有下过山。我师父师祖当年给他取名的时候，本来想叫陆青马，但是字太难看，就改成了陆青莲。我师父觉得自己爹死得早没给他取名，硬生生给改了回来，他觉得陆青莲比陆青马好听一辈子，他说青马还不如叫青驴，后来他就叫陆青莲。</p>
-<p data-t="188.0" data-i="26">陆青莲，听着像女子，但我师父是个大男人，胡子拉碴的那种。他剑术不算高，但是江湖上公认他人缘好。所谓人缘好就是他下山谁都能跟他喝两盅，喝完都愿意赊他账。我小时候特崇拜这个本事。后来我下山才发现，所谓人缘好就是别人不愿意跟他动剑，因为跟他动剑的人也赊他账，赊完又不好意思要回来，不如不跟他打。</p>
-<p data-t="222.4" data-i="29">我师父一辈子总结下来就是一句话：武功不高，喝酒第一。</p>
-<p data-t="228.1" data-i="30">但我师父师父的师父，是个真高手。</p>
-<p data-t="231.7" data-i="31">这位高人叫做陆承清，是我们听雪剑门的第十七代掌门。十六岁下山，三十岁回山，七十岁死。中间五十四年都在江湖上漂着，等他回来的时候，山上道观都快倒了。他花了二十多年修屋顶，修得我们这片山中屋顶最结实的就是他家。最厉害的一次是有一年发山洪，山下的庙都塌了，山上的就他家没塌。山下的和尚来找他借地方住，他说你住吧，反正多一个不多，多两个我也有地方睡。</p>
-<p data-t="273.1" data-i="35">他这种人就是传说中的大侠。武侠故事里写的那些大侠就是他这种人——武艺高强，性格孤僻，不苟言笑，走到哪里都不给面子。我师父说，他当年回山来的时候，身上穿的衣裳都是补了又补的，吃的饭都是稀得能照见人影的粥，但是剑养得雪亮。剑刃雪亮到他晚上把剑放在床头，半个屋子都亮堂堂。我们山上那时候还没油灯，就靠这把剑照了一个月的明。</p>
-<p data-t="311.2" data-i="39">这位老掌门的武功之高，我至今没见过有人能形容出来。我师父形容过一次，说他左手能把一壶热酒隔空搬到右手上，再隔空放到桌上，桌上的人毫发无伤。听起来跟庙里的罗汉一样，但其实他左手右手他都没动，纯粹用剑鞘当钩子，把酒壶勾过去。</p>
-<p data-t="337.9" data-i="41">&quot;但是，&quot;我师父说，&quot;他眼神不好。&quot;</p>
-<p data-t="342.3" data-i="42">我说：&quot;眼神不好是什么意思？&quot;</p>
-<p data-t="345.9" data-i="43">我师父说：&quot;就是说，他到了五十岁那年，看见我也叫师兄。&quot;</p>
-<p data-t="352.0" data-i="44">这是我师父和我师祖之间的关系 — 师祖眼神不好，总是以为我师父是他早夭的师兄转世。每次我师父纠正他，他都说&quot;你就是，记得别再投畜生道了&quot;。我师父纠正了二十年，到后来也懒得纠正。</p>
-<p data-t="373.2" data-i="46">陆承清是上一辈人心中真正的神。</p>
-<p data-t="376.4" data-i="47">而我要讲的不是他。</p>
-<p data-t="378.8" data-i="48">我要讲的是后来。</p>
+<h2 class="chapter-h" data-chapter="1" id="第一章-山上的人" data-audio="1" data-mp3="audio/ch1.mp3">第一章 山上的人</h2>
+<p data-t="0.0" data-i="0" data-chapter="1">我是被师父从山下捡回来的。</p>
+<p data-t="2.8" data-i="1" data-chapter="1">这说法是我师父说的版本。另一个版本是我师父说的另一个版本，他说我是从天上掉下来的。听起来后者比较有来头，但前者听起来比较现实。我师父是个现实的人，他选择相信前者。</p>
+<p data-t="19.7" data-i="2" data-chapter="1">我八岁那年，师父下山去买米，看见路边一个小孩在啃树皮。他本来不想管的，他说他不是菩萨，他说他一个练剑的人看见路边有人啃树皮，多一事不如少一事。但他走了两步又回来了，因为他发现那个小孩啃树皮啃得很有章法，每一根树皮都是顺着一个方向啃的，啃出来的木屑飘落在地上，整整齐齐一排，像是用剑削出来的。</p>
+<p data-t="53.8" data-i="4" data-chapter="1">他当时很惊讶。他说他练剑二十多年，下山行走江湖几十年，没见过一个小孩子把嚼碎木屑也能吐得这么齐整。</p>
+<p data-t="64.7" data-i="5" data-chapter="1">他蹲下来问我：小孩，你饿吗。</p>
+<p data-t="68.9" data-i="6" data-chapter="1">我说饿。</p>
+<p data-t="69.9" data-i="7" data-chapter="1">他问：你爹妈呢。</p>
+<p data-t="72.3" data-i="8" data-chapter="1">我说不知道。</p>
+<p data-t="73.8" data-i="9" data-chapter="1">他问：你叫什么名字。</p>
+<p data-t="76.3" data-i="10" data-chapter="1">我说方无咎。</p>
+<p data-t="77.7" data-i="11" data-chapter="1">他愣了一下，站起来就走。走了几步又回头说：你跟我走吧。</p>
+<p data-t="84.7" data-i="12" data-chapter="1">我放下树皮，问他：你管饭吗。</p>
+<p data-t="88.3" data-i="13" data-chapter="1">他说管。</p>
+<p data-t="89.2" data-i="14" data-chapter="1">我说：那行。</p>
+<p data-t="91.0" data-i="15" data-chapter="1">就这样，我上了听雪山。</p>
+<p data-t="93.5" data-i="16" data-chapter="1">后来他告诉我，他蹲下来问我名字的时候，我报出&quot;方无咎&quot;三个字，他以为我爹是读书人，并且死前给我把这三个字教了很多遍。读书人家的小孩，父母双亡，下落不明，吃树皮吃得跟练剑一样——这种配置，在当时的江湖上大概率只有一个出处：某个刚被灭了门的门派里流落出来的小孩。</p>
+<p data-t="122.6" data-i="18" data-chapter="1">他去查过。查了三个月，没查到任何一个叫得出名字的门派在那两年被灭过门。</p>
+<p data-t="130.5" data-i="19" data-chapter="1">他说，那也行，那就不查了，反正山上缺一个扫地的。</p>
+<p data-t="137.6" data-i="20" data-chapter="1">这就是我师父。一个大智若愚的人，或者说，就是一个挺倒霉的人。</p>
+<p data-t="144.3" data-i="21" data-chapter="1">我师父叫陆青莲。</p>
+<p data-t="146.1" data-i="22" data-chapter="1">听起来像个女人，但他当时说这是按辈分取的，他上上一辈有个师祖叫陆青骢，传说是个白马银枪的少年将军，后来因为失恋躲到山上来给老观主烧火，烧了三十年，火烧得世上最好，但是再也没有下过山。我师父师祖当年给他取名的时候，本来想叫陆青马，但是字太难看，就改成了陆青莲。我师父觉得自己爹死得早没给他取名，硬生生给改了回来，他觉得陆青莲比陆青马好听一辈子，他说青马还不如叫青驴，后来他就叫陆青莲。</p>
+<p data-t="188.0" data-i="26" data-chapter="1">陆青莲，听着像女子，但我师父是个大男人，胡子拉碴的那种。他剑术不算高，但是江湖上公认他人缘好。所谓人缘好就是他下山谁都能跟他喝两盅，喝完都愿意赊他账。我小时候特崇拜这个本事。后来我下山才发现，所谓人缘好就是别人不愿意跟他动剑，因为跟他动剑的人也赊他账，赊完又不好意思要回来，不如不跟他打。</p>
+<p data-t="222.4" data-i="29" data-chapter="1">我师父一辈子总结下来就是一句话：武功不高，喝酒第一。</p>
+<p data-t="228.1" data-i="30" data-chapter="1">但我师父师父的师父，是个真高手。</p>
+<p data-t="231.7" data-i="31" data-chapter="1">这位高人叫做陆承清，是我们听雪剑门的第十七代掌门。十六岁下山，三十岁回山，七十岁死。中间五十四年都在江湖上漂着，等他回来的时候，山上道观都快倒了。他花了二十多年修屋顶，修得我们这片山中屋顶最结实的就是他家。最厉害的一次是有一年发山洪，山下的庙都塌了，山上的就他家没塌。山下的和尚来找他借地方住，他说你住吧，反正多一个不多，多两个我也有地方睡。</p>
+<p data-t="273.1" data-i="35" data-chapter="1">他这种人就是传说中的大侠。武侠故事里写的那些大侠就是他这种人——武艺高强，性格孤僻，不苟言笑，走到哪里都不给面子。我师父说，他当年回山来的时候，身上穿的衣裳都是补了又补的，吃的饭都是稀得能照见人影的粥，但是剑养得雪亮。剑刃雪亮到他晚上把剑放在床头，半个屋子都亮堂堂。我们山上那时候还没油灯，就靠这把剑照了一个月的明。</p>
+<p data-t="311.2" data-i="39" data-chapter="1">这位老掌门的武功之高，我至今没见过有人能形容出来。我师父形容过一次，说他左手能把一壶热酒隔空搬到右手上，再隔空放到桌上，桌上的人毫发无伤。听起来跟庙里的罗汉一样，但其实他左手右手他都没动，纯粹用剑鞘当钩子，把酒壶勾过去。</p>
+<p data-t="337.9" data-i="41" data-chapter="1">&quot;但是，&quot;我师父说，&quot;他眼神不好。&quot;</p>
+<p data-t="342.3" data-i="42" data-chapter="1">我说：&quot;眼神不好是什么意思？&quot;</p>
+<p data-t="345.9" data-i="43" data-chapter="1">我师父说：&quot;就是说，他到了五十岁那年，看见我也叫师兄。&quot;</p>
+<p data-t="352.0" data-i="44" data-chapter="1">这是我师父和我师祖之间的关系 — 师祖眼神不好，总是以为我师父是他早夭的师兄转世。每次我师父纠正他，他都说&quot;你就是，记得别再投畜生道了&quot;。我师父纠正了二十年，到后来也懒得纠正。</p>
+<p data-t="373.2" data-i="46" data-chapter="1">陆承清是上一辈人心中真正的神。</p>
+<p data-t="376.4" data-i="47" data-chapter="1">而我要讲的不是他。</p>
+<p data-t="378.8" data-i="48" data-chapter="1">我要讲的是后来。</p>
 <hr/>
-<p data-t="380.6" data-i="49">听雪山上很安静。</p>
-<p data-t="382.4" data-i="50">这种安静不是那种风景区里的安静。风景区里的安静是舒服的。或者说，风景区是给那些&quot;觉得安静很舒服&quot;的人准备的。山上的安静不是。山上的安静是一种，真的什么都没有的安静。</p>
-<p data-t="401.5" data-i="52">早上起来，走出门，看见云，云就在你脚下。看见树，树就在你肩膀上。看见一只鸟，那鸟看见你之后，不飞，它盯着你。它比你还镇定。</p>
-<p data-t="418.1" data-i="53">这就是听雪山的早晨。</p>
-<p data-t="420.2" data-i="54">我八岁那年刚来的时候，觉得这地方好玩得不得了。没爹没娘的孩子最知道什么叫自由。自由就是你不需要跟任何人交代。我在下山之前吃树皮的时候是这样，在山上吃饱了以后也是这样。所以我一上山就觉得我到了天堂。</p>
-<p data-t="442.2" data-i="57">我师父不知道是看出了我这个心态还是怎么，他说了一段话。他说：</p>
-<p data-t="447.9" data-i="58">&quot;无咎，你要知道，山上什么都好，就是不好玩。不好玩的意思是，你一开始可能觉得好玩，但是十年二十年你会觉得不好玩。那个时候你再想下山是来不及的。练剑这件事是这样的，要么你别练，要么你就要练一辈子。半途下山的人江湖上不认你，山上也不认你。你就是个没人要的。&quot;</p>
-<p data-t="476.7" data-i="60">我当时点头如捣蒜，也不知道他在说什么。</p>
-<p data-t="480.9" data-i="61">但后来我懂了。</p>
-<p data-t="482.3" data-i="62">练剑这件事，在山上练，是一件事。下山练，是另一件事。山上的剑是用来给自己的，下山的剑是用来给别人的。山上的剑可以练到八十岁没有人看见，下山的剑练到八十岁没有人陪你下棋。</p>
-<p data-t="503.0" data-i="64">而听雪山上最缺的就是陪人下棋的。</p>
-<p data-t="506.6" data-i="65">我师父在我八岁那年把我捡回来，按理说我是他第十七代弟子里的哪一个。其实我也不知道，我师父也不给我说，他说我也是按辈分给取了的，无咎两个字正好是某一代的字辈里排着的。他没说是什么字辈，他说不重要，重要的是你往后就这么叫，反正在山上，没人问你这些。</p>
-<p data-t="533.7" data-i="67">我师父一辈子糊涂。就这么两个人，能弄清楚就要弄清楚，弄不清楚的就算了。</p>
-<p data-t="540.5" data-i="68">听雪山上除了我师父和我，还有几个人。</p>
-<p data-t="544.7" data-i="69">第一个是我大师兄，叫周止。这个名字听起来像个有道高僧，但实际上他一辈子最大的愿望是还俗。周止其实已经还俗过两次，第一次还俗跑下山去做生意，做了三个月赔了十几个铜板，又回来了。第二次还俗去找一个他曾经在庙会上认识的女子，结果那个女子已经嫁给了城里的一个秀才。他下山那天，山上的积雪有两尺厚，他一脚踩空滑到了山脚底下，等他绕回来脸上已经全是泥了。我师父当时看他一眼说：你这是摔着走的吧。周止说师父我没摔着我也没走着，我是滑着回来的，我师父说我问的是你脸上的表情。</p>
-<p data-t="599.8" data-i="74">周止后来给我说过，他这辈子最满意的不是剑，是他那块玉佩。那块玉佩是他娘临死前给他缝在腰上的，他一直藏着，藏到十年后才拿出来看。我问他玉佩上刻的什么，他说刻的是他娘的牙。我当时没听懂，后来才明白，是他娘临死前咬过他一口，咬在指头上没咬破，把那块玉佩上的齿痕当成了他娘的&quot;刻&quot;。</p>
-<p data-t="633.5" data-i="77">周止一辈子没学好剑，主要原因是他太好说话了。剑客应该是那种冷面冷心的人，再不济也得是冷面热心。但周止是热面热心，剑没练好就先把毛病都让别人看见了。他有什么好东西都要拿出来分，分到最后自己没东西，自己也不着急。这是一种很糟糕的性格。</p>
-<p data-t="663.0" data-i="79">第二个是我二师姐，叫陆小忍。这个&quot;陆&quot;是她自己的姓，她是陆家收养的孩子，所以她姓陆。小忍是她师父给取的，因为她师父说她&quot;小不忍则乱大谋&quot;。其实她师父是想说她动不动就要跟人打架，不管对方武功高低她都要打，打得过就打，打不过也要打。她师父给她取名小忍，希望她能忍。但她忍了十七年也没忍出什么来。</p>
-<p data-t="699.7" data-i="82">小忍师姐剑法是山上最好的，剑法最好不是说她在江湖上能排第几，山上就这几个人，她排第几不重要。她剑法好是因为她好像天生就跟剑熟悉。我师父说过，江湖上有两种剑客，一种是把剑当成手臂的延伸，一种是剑就是剑，她就是第二种。她说，剑就是剑。我有的时候觉得你跟它没关系它才跟你有关系。你越把它当成自己的，它越不听话。</p>
-<p data-t="736.4" data-i="85">小忍师姐最厉害的不是剑法，是脾气。脾气跟她的名字其实是反着的。她叫小忍，但是谁都不敢惹她。山上的师兄都知道，如果你跟小忍师姐吵架，吵赢了她会让你输，吵输了你更会输。有一次大师兄周止不小心把她的洗脚水倒了，她追着周止从山腰打到山脚，最后周止把自己的洗脚水也倒了她才消停。</p>
-<p data-t="765.9" data-i="88">但是小忍师姐对我不一样。她从来不跟我吵。我八岁那年上山，个子还不到她腰，她那时候十二岁，每天就负责教我认字。她认字比我多，所以她教我认字的时候很有耐心的样子。但是这个&quot;有耐心的样子&quot;很短暂，等我到了十二岁她认字认不过我的时候，她就开始用剑跟我说话了。</p>
+<p data-t="380.6" data-i="49" data-chapter="1">听雪山上很安静。</p>
+<p data-t="382.4" data-i="50" data-chapter="1">这种安静不是那种风景区里的安静。风景区里的安静是舒服的。或者说，风景区是给那些&quot;觉得安静很舒服&quot;的人准备的。山上的安静不是。山上的安静是一种，真的什么都没有的安静。</p>
+<p data-t="401.5" data-i="52" data-chapter="1">早上起来，走出门，看见云，云就在你脚下。看见树，树就在你肩膀上。看见一只鸟，那鸟看见你之后，不飞，它盯着你。它比你还镇定。</p>
+<p data-t="418.1" data-i="53" data-chapter="1">这就是听雪山的早晨。</p>
+<p data-t="420.2" data-i="54" data-chapter="1">我八岁那年刚来的时候，觉得这地方好玩得不得了。没爹没娘的孩子最知道什么叫自由。自由就是你不需要跟任何人交代。我在下山之前吃树皮的时候是这样，在山上吃饱了以后也是这样。所以我一上山就觉得我到了天堂。</p>
+<p data-t="442.2" data-i="57" data-chapter="1">我师父不知道是看出了我这个心态还是怎么，他说了一段话。他说：</p>
+<p data-t="447.9" data-i="58" data-chapter="1">&quot;无咎，你要知道，山上什么都好，就是不好玩。不好玩的意思是，你一开始可能觉得好玩，但是十年二十年你会觉得不好玩。那个时候你再想下山是来不及的。练剑这件事是这样的，要么你别练，要么你就要练一辈子。半途下山的人江湖上不认你，山上也不认你。你就是个没人要的。&quot;</p>
+<p data-t="476.7" data-i="60" data-chapter="1">我当时点头如捣蒜，也不知道他在说什么。</p>
+<p data-t="480.9" data-i="61" data-chapter="1">但后来我懂了。</p>
+<p data-t="482.3" data-i="62" data-chapter="1">练剑这件事，在山上练，是一件事。下山练，是另一件事。山上的剑是用来给自己的，下山的剑是用来给别人的。山上的剑可以练到八十岁没有人看见，下山的剑练到八十岁没有人陪你下棋。</p>
+<p data-t="503.0" data-i="64" data-chapter="1">而听雪山上最缺的就是陪人下棋的。</p>
+<p data-t="506.6" data-i="65" data-chapter="1">我师父在我八岁那年把我捡回来，按理说我是他第十七代弟子里的哪一个。其实我也不知道，我师父也不给我说，他说我也是按辈分给取了的，无咎两个字正好是某一代的字辈里排着的。他没说是什么字辈，他说不重要，重要的是你往后就这么叫，反正在山上，没人问你这些。</p>
+<p data-t="533.7" data-i="67" data-chapter="1">我师父一辈子糊涂。就这么两个人，能弄清楚就要弄清楚，弄不清楚的就算了。</p>
+<p data-t="540.5" data-i="68" data-chapter="1">听雪山上除了我师父和我，还有几个人。</p>
+<p data-t="544.7" data-i="69" data-chapter="1">第一个是我大师兄，叫周止。这个名字听起来像个有道高僧，但实际上他一辈子最大的愿望是还俗。周止其实已经还俗过两次，第一次还俗跑下山去做生意，做了三个月赔了十几个铜板，又回来了。第二次还俗去找一个他曾经在庙会上认识的女子，结果那个女子已经嫁给了城里的一个秀才。他下山那天，山上的积雪有两尺厚，他一脚踩空滑到了山脚底下，等他绕回来脸上已经全是泥了。我师父当时看他一眼说：你这是摔着走的吧。周止说师父我没摔着我也没走着，我是滑着回来的，我师父说我问的是你脸上的表情。</p>
+<p data-t="599.8" data-i="74" data-chapter="1">周止后来给我说过，他这辈子最满意的不是剑，是他那块玉佩。那块玉佩是他娘临死前给他缝在腰上的，他一直藏着，藏到十年后才拿出来看。我问他玉佩上刻的什么，他说刻的是他娘的牙。我当时没听懂，后来才明白，是他娘临死前咬过他一口，咬在指头上没咬破，把那块玉佩上的齿痕当成了他娘的&quot;刻&quot;。</p>
+<p data-t="633.5" data-i="77" data-chapter="1">周止一辈子没学好剑，主要原因是他太好说话了。剑客应该是那种冷面冷心的人，再不济也得是冷面热心。但周止是热面热心，剑没练好就先把毛病都让别人看见了。他有什么好东西都要拿出来分，分到最后自己没东西，自己也不着急。这是一种很糟糕的性格。</p>
+<p data-t="663.0" data-i="79" data-chapter="1">第二个是我二师姐，叫陆小忍。这个&quot;陆&quot;是她自己的姓，她是陆家收养的孩子，所以她姓陆。小忍是她师父给取的，因为她师父说她&quot;小不忍则乱大谋&quot;。其实她师父是想说她动不动就要跟人打架，不管对方武功高低她都要打，打得过就打，打不过也要打。她师父给她取名小忍，希望她能忍。但她忍了十七年也没忍出什么来。</p>
+<p data-t="699.7" data-i="82" data-chapter="1">小忍师姐剑法是山上最好的，剑法最好不是说她在江湖上能排第几，山上就这几个人，她排第几不重要。她剑法好是因为她好像天生就跟剑熟悉。我师父说过，江湖上有两种剑客，一种是把剑当成手臂的延伸，一种是剑就是剑，她就是第二种。她说，剑就是剑。我有的时候觉得你跟它没关系它才跟你有关系。你越把它当成自己的，它越不听话。</p>
+<p data-t="736.4" data-i="85" data-chapter="1">小忍师姐最厉害的不是剑法，是脾气。脾气跟她的名字其实是反着的。她叫小忍，但是谁都不敢惹她。山上的师兄都知道，如果你跟小忍师姐吵架，吵赢了她会让你输，吵输了你更会输。有一次大师兄周止不小心把她的洗脚水倒了，她追着周止从山腰打到山脚，最后周止把自己的洗脚水也倒了她才消停。</p>
+<p data-t="765.9" data-i="88" data-chapter="1">但是小忍师姐对我不一样。她从来不跟我吵。我八岁那年上山，个子还不到她腰，她那时候十二岁，每天就负责教我认字。她认字比我多，所以她教我认字的时候很有耐心的样子。但是这个&quot;有耐心的样子&quot;很短暂，等我到了十二岁她认字认不过我的时候，她就开始用剑跟我说话了。</p>
 <p>用剑说话是我师父的意思——山上同门之间，用木剑过招。</p>
-<p data-t="796.7" data-i="91">我十二岁那年第一次拿木剑跟小忍师姐过招，结果一招没过，我被她用木剑柄敲了一下脑袋。</p>
-<p data-t="804.6" data-i="92">她说：&quot;你以后要是再用这种剑法跟人比武，人家会以为你是来搞笑的。&quot;</p>
-<p data-t="812.6" data-i="93">我承认我剑法不行。</p>
-<p data-t="814.7" data-i="94">但我承认我师父剑法也不行。</p>
-<p data-t="817.5" data-i="95">听雪山上，准确的来说，剑法最厉害的人不是陆青莲，也不是陆小忍，也不是周止，是师祖陆承清。但陆承清那时候已经不下山了，也不跟徒弟们过招。他每天就在山上最高的那块石头上坐着。坐着看远处，远处什么都没有。</p>
-<p data-t="841.4" data-i="98">我师父有一次被师祖叫过去，师祖跟他说了一段话：&quot;你们这群孩子练剑，练得再多也是江湖中下等的水平。&quot;</p>
-<p data-t="851.8" data-i="99">我师父说：&quot;是。&quot;</p>
-<p data-t="853.8" data-i="100">师祖说：&quot;但是你们也有你们的用处。&quot;</p>
-<p data-t="858.0" data-i="101">我师父问：&quot;什么用处？&quot;</p>
-<p data-t="860.8" data-i="102">师祖说：&quot;看门。&quot;</p>
-<p data-t="863.2" data-i="103">我师父沉默了一会。</p>
-<p data-t="865.2" data-i="104">师祖说：&quot;你这辈子最大的用处，就是看门。但是不丢人了，你看门看得好的话，比有的人杀人杀得好还要功夫深。&quot;</p>
-<p data-t="877.4" data-i="105">我师父那时候才三十多岁。他说听了这话他哭了三天。</p>
-<p data-t="883.4" data-i="106">他后来跟我说，那个师祖不会说话，说完这话他下山云游去了，三个月才回来，回来的时候一脸没事人一样，而我师父还红着眼。</p>
-<p data-t="896.5" data-i="107">这就是听雪山的师祖。一个让别人哭三天自己也忘了的人。</p>
-<p data-t="902.1" data-i="108">听雪山上，还有一位师祖辈的人物，就是之前说的常年卧病在床的那位。这位叫陆茂山，是陆承清的师弟。陆茂山比陆承清小十几岁，但是没下山过。他一辈子就住在道观后院的小屋里，屋门口常年放着一把藤椅，藤椅上常年躺着一个人，那个人的脸上常年盖着一本书。</p>
-<p data-t="931.3" data-i="110">他的武功谁也没见过。我师父说他武功很高，甚至比陆承清还高。我问为什么不见他出手，我师父说他早就不出手了。</p>
-<p data-t="944.9" data-i="111">我那时候小，听不懂这话，觉得一个这么厉害的人怎么就不出手。长大了才明白，江湖上的高手不是不打架，而是没什么值得打的。</p>
-<p data-t="958.1" data-i="112">陆茂山师叔祖每天喜欢给我讲故事。他讲故事讲得最多的是江湖上的故事。他说他以前在江湖上的名号叫&quot;清夜一剑&quot;，意思是只要对手能在天黑之前找到他，他就在夜里出剑。我问那找到了呢，他说找到了他也不出剑，因为他那时候已经不在江湖了。我说你都不在江湖了别人找你干什么，他说找你的人大部分都不知道你不在江湖。</p>
-<p data-t="991.5" data-i="114">我八岁那年就是听不懂这话的。</p>
+<p data-t="796.7" data-i="91" data-chapter="1">我十二岁那年第一次拿木剑跟小忍师姐过招，结果一招没过，我被她用木剑柄敲了一下脑袋。</p>
+<p data-t="804.6" data-i="92" data-chapter="1">她说：&quot;你以后要是再用这种剑法跟人比武，人家会以为你是来搞笑的。&quot;</p>
+<p data-t="812.6" data-i="93" data-chapter="1">我承认我剑法不行。</p>
+<p data-t="814.7" data-i="94" data-chapter="1">但我承认我师父剑法也不行。</p>
+<p data-t="817.5" data-i="95" data-chapter="1">听雪山上，准确的来说，剑法最厉害的人不是陆青莲，也不是陆小忍，也不是周止，是师祖陆承清。但陆承清那时候已经不下山了，也不跟徒弟们过招。他每天就在山上最高的那块石头上坐着。坐着看远处，远处什么都没有。</p>
+<p data-t="841.4" data-i="98" data-chapter="1">我师父有一次被师祖叫过去，师祖跟他说了一段话：&quot;你们这群孩子练剑，练得再多也是江湖中下等的水平。&quot;</p>
+<p data-t="851.8" data-i="99" data-chapter="1">我师父说：&quot;是。&quot;</p>
+<p data-t="853.8" data-i="100" data-chapter="1">师祖说：&quot;但是你们也有你们的用处。&quot;</p>
+<p data-t="858.0" data-i="101" data-chapter="1">我师父问：&quot;什么用处？&quot;</p>
+<p data-t="860.8" data-i="102" data-chapter="1">师祖说：&quot;看门。&quot;</p>
+<p data-t="863.2" data-i="103" data-chapter="1">我师父沉默了一会。</p>
+<p data-t="865.2" data-i="104" data-chapter="1">师祖说：&quot;你这辈子最大的用处，就是看门。但是不丢人了，你看门看得好的话，比有的人杀人杀得好还要功夫深。&quot;</p>
+<p data-t="877.4" data-i="105" data-chapter="1">我师父那时候才三十多岁。他说听了这话他哭了三天。</p>
+<p data-t="883.4" data-i="106" data-chapter="1">他后来跟我说，那个师祖不会说话，说完这话他下山云游去了，三个月才回来，回来的时候一脸没事人一样，而我师父还红着眼。</p>
+<p data-t="896.5" data-i="107" data-chapter="1">这就是听雪山的师祖。一个让别人哭三天自己也忘了的人。</p>
+<p data-t="902.1" data-i="108" data-chapter="1">听雪山上，还有一位师祖辈的人物，就是之前说的常年卧病在床的那位。这位叫陆茂山，是陆承清的师弟。陆茂山比陆承清小十几岁，但是没下山过。他一辈子就住在道观后院的小屋里，屋门口常年放着一把藤椅，藤椅上常年躺着一个人，那个人的脸上常年盖着一本书。</p>
+<p data-t="931.3" data-i="110" data-chapter="1">他的武功谁也没见过。我师父说他武功很高，甚至比陆承清还高。我问为什么不见他出手，我师父说他早就不出手了。</p>
+<p data-t="944.9" data-i="111" data-chapter="1">我那时候小，听不懂这话，觉得一个这么厉害的人怎么就不出手。长大了才明白，江湖上的高手不是不打架，而是没什么值得打的。</p>
+<p data-t="958.1" data-i="112" data-chapter="1">陆茂山师叔祖每天喜欢给我讲故事。他讲故事讲得最多的是江湖上的故事。他说他以前在江湖上的名号叫&quot;清夜一剑&quot;，意思是只要对手能在天黑之前找到他，他就在夜里出剑。我问那找到了呢，他说找到了他也不出剑，因为他那时候已经不在江湖了。我说你都不在江湖了别人找你干什么，他说找你的人大部分都不知道你不在江湖。</p>
+<p data-t="991.5" data-i="114" data-chapter="1">我八岁那年就是听不懂这话的。</p>
 <p>但是我喜欢听故事。我尤其喜欢听他说，听说当年江湖上有个人物叫&quot;九指神魔&quot;，这位神魔只有九个手指，因为少了一根，是他自己砍的，原因是他觉得十根手指练剑太多余。</p>
-<p data-t="1014.1" data-i="117">我还听说江湖上有个人物叫&quot;醉里长歌&quot;，这位老兄喝酒喝到兴起就要拿剑在酒馆里舞剑，结果舞着舞着就把酒馆老板给砍了，从此江湖上不许他进任何一家酒馆。</p>
-<p data-t="1029.7" data-i="118">这些都是十八路野狐禅，不上台面。但是陆茂山师叔祖讲得绘声绘色，像是他在现场一样。</p>
-<p data-t="1038.4" data-i="119">后来我才知道，他这些故事大部分确实是他&quot;在&quot;现场的。</p>
-<p data-t="1044.1" data-i="120">只是他不在江湖上了，江湖也忘了他。</p>
+<p data-t="1014.1" data-i="117" data-chapter="1">我还听说江湖上有个人物叫&quot;醉里长歌&quot;，这位老兄喝酒喝到兴起就要拿剑在酒馆里舞剑，结果舞着舞着就把酒馆老板给砍了，从此江湖上不许他进任何一家酒馆。</p>
+<p data-t="1029.7" data-i="118" data-chapter="1">这些都是十八路野狐禅，不上台面。但是陆茂山师叔祖讲得绘声绘色，像是他在现场一样。</p>
+<p data-t="1038.4" data-i="119" data-chapter="1">后来我才知道，他这些故事大部分确实是他&quot;在&quot;现场的。</p>
+<p data-t="1044.1" data-i="120" data-chapter="1">只是他不在江湖上了，江湖也忘了他。</p>
 <hr/>
-<h2 class="chapter-h" data-chapter="2" id="第二章-下山">第二章 下山</h2>
-<p>我在山上待了十年。</p>
-<p>十年的时间，从八岁到十八岁。这十年里我学会了一件事：怎么在山上活下去。另一件事：怎么学会剑。第三件事：怎么让自己不像个剑客。</p>
-<p>第三件事我学得最好。</p>
-<p>我十八岁那年，离我师父跟我说&quot;山上没前途的&quot;还差一年。但是我说不上来为什么，那一年我突然想要下山。</p>
-<p>想要下山的原因很具体，是因为我认识了一个山下的女人。</p>
-<p>那个女人是山下镇上一个卖豆腐的。我师父下山买米的时候，看见她家有豆腐卖，他说他不想买，但是那豆腐闻起来很香。</p>
-<p>我那时候也十八岁，我师父下山买米从来不带我。他说山下的世界就是给山下人准备的，山上的人下去一趟就回来，下来两趟就回不来了。</p>
-<p>我不信。</p>
-<p>我趁我师父下山买米的那天，自己跑下山。</p>
-<p>下山是我第一次真正意义上的下山。</p>
-<p>山下的镇子不大，一条街，街上有个包子铺一个馄饨摊一个杂货铺一个铁匠铺一个棺材铺。这五个铺子构成了镇子的全部商业。我当时站了一下，不知道自己应该去哪里。我师父出门前跟我说的是：你要是下山，就不要回来。</p>
-<p>我那时候觉得这是骗人的。我师父这么说，不过是想让我不下山罢了。</p>
-<p>我在街上转了一圈，到了那个卖豆腐的家门口。</p>
-<p>门口坐着一个女人。</p>
-<p>那女人不年轻了。也不算老。二十六七的样子。她头发挽成一个髻，手里拿着一块布料在绣花。看上去她是在家门口绣花。门口有一只小猫在边上趴着。</p>
-<p>我走过去的时候，看见小猫抬头看了我一眼，然后又趴下了。</p>
-<p>我也不知道要说什么。我就站在那里。</p>
-<p>那个女人抬头看了我一眼。</p>
-<p>她说：&quot;公子要买豆腐吗？&quot;</p>
-<p>我回过神来说：&quot;豆腐今天不用了。&quot;</p>
-<p>她说：&quot;那公子要买什么？&quot;</p>
-<p>我说：&quot;我什么都不买。&quot;</p>
-<p>她说：&quot;那公子就站在那里吧。我家公子你不要站在这里，会挡别人买豆腐。&quot;</p>
-<p>我这才意识到我还站着，挡着她家门口的生意。</p>
-<p>我赶紧挪到一边。</p>
-<p>我当时其实想跟她说话，但是不知道说什么。我在那条街上转了一圈又一圈，最后还是回到她的门口。但是她已经不绣花了，进去卖豆腐了。</p>
-<p>我回家的时候天已经黑了。</p>
-<p>我师父在山上等着我。我看见我师父坐在门口的台阶上。他看见我回来，点了点头。我以为他要骂我，结果他说了一句：&quot;回来了？吃了吗？&quot;</p>
-<p>我说没吃。</p>
-<p>他说：&quot;厨房里剩了半锅粥，你自己去热。&quot;</p>
-<p>我去厨房热粥。</p>
-<p>我一边热粥一边想，我师父这样的反应非常不寻常。他要不就是真的不在乎我下山，要不就是他生气到一定的程度反而不想说话了。</p>
-<p>后来我才知道，两者都不是。我师父当时的反应是因为他自己也刚从山下回来，他下山买米，他买米的过程中把米袋掉到了河里。</p>
-<p>那半个月米粮店赊的账让他心疼了三天。</p>
-<p>所以我没告诉他我下山的真正原因。他也没问。</p>
-<p>我的&quot;下山&quot;这件事就这么过去了。</p>
-<p>之后，我开始频繁下山。</p>
-<p>我师父最初几次还跟着去。他说他要看看我这个徒弟到底下山干啥。他跟着我去了几次镇子上，每次都买点东西，然后回家。</p>
-<p>后来他不去了。他说让我自己去，自己回来，山上的米粮店不会再赊账了。</p>
-<p>我每次下山都会走过豆腐摊前。</p>
-<p>那个卖豆腐的女人我后来知道她叫素娘。</p>
-<p>素娘这个名字听起来像青楼里的人，但是她就是一个普通的卖豆腐的人。她丈夫去年去了世，留下她和她的婆婆，还有她那只小猫。</p>
-<p>我每次去她那里买豆腐。</p>
-<p>一开始她也觉得奇怪，山上来的小子，怎么老来她这里买豆腐？后来她也不问了。她一边切豆腐一边跟我说一会儿话。说她今天生意好不好啊，说她婆婆今天又骂她啊，说她的小猫又偷吃了。</p>
-<p>我听着觉得很舒服。</p>
-<p>我当时十七八岁的年纪，没跟人这样说过话。山上的师兄弟不太会说话，跟我师父说话是请教，跟小忍师姐说话是挨训。所以我跟素娘这样说话的时光很罕见。</p>
-<p>我从来没告诉她我是练剑的。她也从来没问。</p>
+<h2 class="chapter-h" data-chapter="2" id="第二章-下山" data-audio="1" data-mp3="audio/ch2.mp3">第二章 下山</h2>
+<p data-t="0.0" data-i="0" data-chapter="2">我在山上待了十年。</p>
+<p data-t="2.1" data-i="1" data-chapter="2">十年的时间，从八岁到十八岁。这十年里我学会了一件事：怎么在山上活下去。另一件事：怎么学会剑。第三件事：怎么让自己不像个剑客。</p>
+<p data-t="18.6" data-i="2" data-chapter="2">第三件事我学得最好。</p>
+<p data-t="21.3" data-i="3" data-chapter="2">我十八岁那年，离我师父跟我说&quot;山上没前途的&quot;还差一年。但是我说不上来为什么，那一年我突然想要下山。</p>
+<p data-t="33.2" data-i="4" data-chapter="2">想要下山的原因很具体，是因为我认识了一个山下的女人。</p>
+<p data-t="38.1" data-i="5" data-chapter="2">那个女人是山下镇上一个卖豆腐的。我师父下山买米的时候，看见她家有豆腐卖，他说他不想买，但是那豆腐闻起来很香。</p>
+<p data-t="49.2" data-i="6" data-chapter="2">我那时候也十八岁，我师父下山买米从来不带我。他说山下的世界就是给山下人准备的，山上的人下去一趟就回来，下来两趟就回不来了。</p>
+<p data-t="65.0" data-i="7" data-chapter="2">我不信。</p>
+<p data-t="65.9" data-i="8" data-chapter="2">我趁我师父下山买米的那天，自己跑下山。</p>
+<p data-t="69.8" data-i="9" data-chapter="2">下山是我第一次真正意义上的下山。</p>
+<p data-t="73.5" data-i="10" data-chapter="2">山下的镇子不大，一条街，街上有个包子铺一个馄饨摊一个杂货铺一个铁匠铺一个棺材铺。这五个铺子构成了镇子的全部商业。我当时站了一下，不知道自己应该去哪里。我师父出门前跟我说的是：你要是下山，就不要回来。</p>
+<p data-t="95.5" data-i="12" data-chapter="2">我那时候觉得这是骗人的。我师父这么说，不过是想让我不下山罢了。</p>
+<p data-t="102.5" data-i="13" data-chapter="2">我在街上转了一圈，到了那个卖豆腐的家门口。</p>
+<p data-t="106.5" data-i="14" data-chapter="2">门口坐着一个女人。</p>
+<p data-t="108.5" data-i="15" data-chapter="2">那女人不年轻了。也不算老。二十六七的样子。她头发挽成一个髻，手里拿着一块布料在绣花。看上去她是在家门口绣花。门口有一只小猫在边上趴着。</p>
+<p data-t="126.4" data-i="16" data-chapter="2">我走过去的时候，看见小猫抬头看了我一眼，然后又趴下了。</p>
+<p data-t="132.1" data-i="17" data-chapter="2">我也不知道要说什么。我就站在那里。</p>
+<p data-t="135.8" data-i="18" data-chapter="2">那个女人抬头看了我一眼。</p>
+<p data-t="138.1" data-i="19" data-chapter="2">她说：&quot;公子要买豆腐吗？&quot;</p>
+<p data-t="141.4" data-i="20" data-chapter="2">我回过神来说：&quot;豆腐今天不用了。&quot;</p>
+<p data-t="145.7" data-i="21" data-chapter="2">她说：&quot;那公子要买什么？&quot;</p>
+<p data-t="149.3" data-i="22" data-chapter="2">我说：&quot;我什么都不买。&quot;</p>
+<p data-t="151.6" data-i="23" data-chapter="2">她说：&quot;那公子就站在那里吧。我家公子你不要站在这里，会挡别人买豆腐。&quot;</p>
+<p data-t="160.2" data-i="24" data-chapter="2">我这才意识到我还站着，挡着她家门口的生意。</p>
+<p data-t="165.1" data-i="25" data-chapter="2">我赶紧挪到一边。</p>
+<p data-t="166.9" data-i="26" data-chapter="2">我当时其实想跟她说话，但是不知道说什么。我在那条街上转了一圈又一圈，最后还是回到她的门口。但是她已经不绣花了，进去卖豆腐了。</p>
+<p data-t="179.0" data-i="27" data-chapter="2">我回家的时候天已经黑了。</p>
+<p data-t="181.7" data-i="28" data-chapter="2">我师父在山上等着我。我看见我师父坐在门口的台阶上。他看见我回来，点了点头。我以为他要骂我，结果他说了一句：&quot;回来了？吃了吗？&quot;</p>
+<p data-t="197.6" data-i="29" data-chapter="2">我说没吃。</p>
+<p data-t="198.7" data-i="30" data-chapter="2">他说：&quot;厨房里剩了半锅粥，你自己去热。&quot;</p>
+<p data-t="203.8" data-i="31" data-chapter="2">我去厨房热粥。</p>
+<p data-t="205.4" data-i="32" data-chapter="2">我一边热粥一边想，我师父这样的反应非常不寻常。他要不就是真的不在乎我下山，要不就是他生气到一定的程度反而不想说话了。</p>
+<p data-t="217.0" data-i="33" data-chapter="2">后来我才知道，两者都不是。我师父当时的反应是因为他自己也刚从山下回来，他下山买米，他买米的过程中把米袋掉到了河里。</p>
+<p data-t="229.7" data-i="34" data-chapter="2">那半个月米粮店赊的账让他心疼了三天。</p>
+<p data-t="234.1" data-i="35" data-chapter="2">所以我没告诉他我下山的真正原因。他也没问。</p>
+<p data-t="239.0" data-i="36" data-chapter="2">我的&quot;下山&quot;这件事就这么过去了。</p>
+<p data-t="242.2" data-i="37" data-chapter="2">之后，我开始频繁下山。</p>
+<p data-t="245.1" data-i="38" data-chapter="2">我师父最初几次还跟着去。他说他要看看我这个徒弟到底下山干啥。他跟着我去了几次镇子上，每次都买点东西，然后回家。</p>
+<p data-t="257.3" data-i="39" data-chapter="2">后来他不去了。他说让我自己去，自己回来，山上的米粮店不会再赊账了。</p>
+<p data-t="265.7" data-i="40" data-chapter="2">我每次下山都会走过豆腐摊前。</p>
+<p data-t="268.6" data-i="41" data-chapter="2">那个卖豆腐的女人我后来知道她叫素娘。</p>
+<p data-t="272.4" data-i="42" data-chapter="2">素娘这个名字听起来像青楼里的人，但是她就是一个普通的卖豆腐的人。她丈夫去年去了世，留下她和她的婆婆，还有她那只小猫。</p>
+<p data-t="285.9" data-i="43" data-chapter="2">我每次去她那里买豆腐。</p>
+<p data-t="288.1" data-i="44" data-chapter="2">一开始她也觉得奇怪，山上来的小子，怎么老来她这里买豆腐？后来她也不问了。她一边切豆腐一边跟我说一会儿话。说她今天生意好不好啊，说她婆婆今天又骂她啊，说她的小猫又偷吃了。</p>
+<p data-t="306.0" data-i="45" data-chapter="2">我听着觉得很舒服。</p>
+<p data-t="308.4" data-i="46" data-chapter="2">我当时十七八岁的年纪，没跟人这样说过话。山上的师兄弟不太会说话，跟我师父说话是请教，跟小忍师姐说话是挨训。所以我跟素娘这样说话的时光很罕见。</p>
+<p data-t="325.1" data-i="47" data-chapter="2">我从来没告诉她我是练剑的。她也从来没问。</p>
 <hr/>
-<p>就这样，半年过去了。</p>
-<p>半年里我断断续续去过那个豆腐摊三四次，每次去都是买豆腐。每次买完就走。</p>
-<p>我心里觉得有什么东西在慢慢变化。</p>
-<p>那一年秋天特别冷，山上的雪来得早。我师父那几天一直念叨着今年的雪下得早。我那天晚上也没睡着，外面的雪落下来的声音真的是有声音的。大概这就是听雪剑门的由来。</p>
-<p>第二天我就下山了。</p>
-<p>到镇子上的时候已经快晌午。我径直去了豆腐摊。素娘还在那里绣花。这次她绣的不是花，是一只小猫——一只跟真猫很像的小猫。</p>
-<p>我蹲下来看着她绣。</p>
-<p>她抬头看见我，微微笑了一下。&quot;方公子来了。&quot;</p>
-<p>她说方公子。</p>
-<p>我愣了一下，我才意识到我从来没告诉她我姓方。我上几次来她就直接卖豆腐，也没问过我姓什么。我师父带我来那几次她也没见过我师父，门口只有我一个人。</p>
-<p>我说：&quot;你叫我方无咎就行。&quot;</p>
-<p>她说：&quot;方无咎啊，好名字。就是有点拗口。&quot;</p>
-<p>我说：&quot;我爹取的。&quot;</p>
-<p>她说：&quot;你爹应该是读书人。读书人给孩子取的名字都有点拗口，拗口的意思就是好听，但是别人读起来费劲。&quot;</p>
-<p>我说：&quot;我没爹，我是我师父养大的。&quot;</p>
-<p>她愣了一下，然后说：&quot;那也是挺好的。&quot;</p>
-<p>她这次没有继续说什么。</p>
-<p>我也没说什么。</p>
-<p>我那天在那她家门口蹲了很久。</p>
-<p>下午她收摊的时候，她说：&quot;方公子，你要是下次还来，我请你喝点东西。我爹以前开过酒馆，我会酿酒，青梅酒。&quot;</p>
-<p>我说好。</p>
-<p>然后我回了山上。</p>
-<p>我师父看我最近下山频率高了，问过我一次。他说：&quot;你是不是有什么事瞒着我？&quot;</p>
-<p>我说没有。</p>
-<p>他说：&quot;你骗师父是没有用的。师父不是要管你，师父管不了你。但是师父要告诉你，山下的事，听听就好，不要当真。&quot;</p>
-<p>我说：&quot;师父，我知道。&quot;</p>
-<p>他看了我一会儿，最后说：&quot;你下山这件事，将来会变成你上山或者下山的理由。你要么因为它上山，要么因为它下山。&quot;</p>
-<p>我当时没听懂。</p>
-<p>我现在也没完全听懂。</p>
-<p>我那时候的懵懂程度，就像我八岁那年刚上山的时候一样。</p>
+<p data-t="329.1" data-i="48" data-chapter="2">就这样，半年过去了。</p>
+<p data-t="331.5" data-i="49" data-chapter="2">半年里我断断续续去过那个豆腐摊三四次，每次去都是买豆腐。每次买完就走。</p>
+<p data-t="340.6" data-i="50" data-chapter="2">我心里觉得有什么东西在慢慢变化。</p>
+<p data-t="343.9" data-i="51" data-chapter="2">那一年秋天特别冷，山上的雪来得早。我师父那几天一直念叨着今年的雪下得早。我那天晚上也没睡着，外面的雪落下来的声音真的是有声音的。大概这就是听雪剑门的由来。</p>
+<p data-t="361.6" data-i="52" data-chapter="2">第二天我就下山了。</p>
+<p data-t="363.3" data-i="53" data-chapter="2">到镇子上的时候已经快晌午。我径直去了豆腐摊。素娘还在那里绣花。这次她绣的不是花，是一只小猫——一只跟真猫很像的小猫。</p>
+<p data-t="378.0" data-i="54" data-chapter="2">我蹲下来看着她绣。</p>
+<p data-t="380.0" data-i="55" data-chapter="2">她抬头看见我，微微笑了一下。&quot;方公子来了。&quot;</p>
+<p data-t="385.7" data-i="56" data-chapter="2">她说方公子。</p>
+<p data-t="386.9" data-i="57" data-chapter="2">我愣了一下，我才意识到我从来没告诉她我姓方。我上几次来她就直接卖豆腐，也没问过我姓什么。我师父带我来那几次她也没见过我师父，门口只有我一个人。</p>
+<p data-t="401.8" data-i="58" data-chapter="2">我说：&quot;你叫我方无咎就行。&quot;</p>
+<p data-t="405.1" data-i="59" data-chapter="2">她说：&quot;方无咎啊，好名字。就是有点拗口。&quot;</p>
+<p data-t="411.0" data-i="60" data-chapter="2">我说：&quot;我爹取的。&quot;</p>
+<p data-t="413.2" data-i="61" data-chapter="2">她说：&quot;你爹应该是读书人。读书人给孩子取的名字都有点拗口，拗口的意思就是好听，但是别人读起来费劲。&quot;</p>
+<p data-t="425.4" data-i="62" data-chapter="2">我说：&quot;我没爹，我是我师父养大的。&quot;</p>
+<p data-t="429.6" data-i="63" data-chapter="2">她愣了一下，然后说：&quot;那也是挺好的。&quot;</p>
+<p data-t="434.1" data-i="64" data-chapter="2">她这次没有继续说什么。</p>
+<p data-t="436.0" data-i="65" data-chapter="2">我也没说什么。</p>
+<p data-t="437.4" data-i="66" data-chapter="2">我那天在那她家门口蹲了很久。</p>
+<p data-t="440.5" data-i="67" data-chapter="2">下午她收摊的时候，她说：&quot;方公子，你要是下次还来，我请你喝点东西。我爹以前开过酒馆，我会酿酒，青梅酒。&quot;</p>
+<p data-t="452.8" data-i="68" data-chapter="2">我说好。</p>
+<p data-t="453.9" data-i="69" data-chapter="2">然后我回了山上。</p>
+<p data-t="455.5" data-i="70" data-chapter="2">我师父看我最近下山频率高了，问过我一次。他说：&quot;你是不是有什么事瞒着我？&quot;</p>
+<p data-t="463.3" data-i="71" data-chapter="2">我说没有。</p>
+<p data-t="464.5" data-i="72" data-chapter="2">他说：&quot;你骗师父是没有用的。师父不是要管你，师父管不了你。但是师父要告诉你，山下的事，听听就好，不要当真。&quot;</p>
+<p data-t="476.8" data-i="73" data-chapter="2">我说：&quot;师父，我知道。&quot;</p>
+<p data-t="480.2" data-i="74" data-chapter="2">他看了我一会儿，最后说：&quot;你下山这件事，将来会变成你上山或者下山的理由。你要么因为它上山，要么因为它下山。&quot;</p>
+<p data-t="493.9" data-i="75" data-chapter="2">我当时没听懂。</p>
+<p data-t="495.4" data-i="76" data-chapter="2">我现在也没完全听懂。</p>
+<p data-t="497.3" data-i="77" data-chapter="2">我那时候的懵懂程度，就像我八岁那年刚上山的时候一样。</p>
 <hr/>
 <h2 class="chapter-h" data-chapter="3" id="第三章-山海图">第三章 山海图</h2>
 <p>我十八岁那年冬天，&quot;山海图&quot;这三个字第一次进了我的耳朵。</p>
@@ -2404,7 +2392,7 @@ body.size-sm h2.chapter-h { font-size: 26px; }
 <p>她剑法是山上最好的，剑法好是因为她好像天生就跟剑熟悉。</p>
 <p>她脾气跟她的名字其实是反着的。她叫小忍，但是谁都不敢惹她。</p>
 <p>她从来不跟我吵。我八岁那年上山，十二岁的时候我们过招，一招没过，被她敲了一下脑袋。</p>
-<p data-t="804.6" data-i="92">她说：&quot;你以后要是再用这种剑法跟人比武，人家会以为你是来搞笑的。&quot;</p>
+<p>她说：&quot;你以后要是再用这种剑法跟人比武，人家会以为你是来搞笑的。&quot;</p>
 <p>她后来下山了，三年没回来。她回山那一天，带了一碗不稀的豆腐脑，给我师父的墓前。</p>
 <p>她师父临死前没吃上。她带着她的豆腐脑上山。</p>
 <p>豆腐脑不稀了。</p>
@@ -5779,13 +5767,7 @@ body.size-sm h2.chapter-h { font-size: 26px; }
   </main>
 
   <aside class="sidebar-right">
-    <section>
-      <h4>🎧 第一章朗读</h4>
-      <p>约 17 分钟 · 老派说书人</p>
-      <a href="audio/ch1.mp3" download>↓ 下载 MP3 (16.5 MB)</a>
-      <a href="audio/ch1_preview.mp3">▶ 30 秒预览</a>
-      <a href="audio/ch1.txt" download>↓ 第一章原文</a>
-    </section>
+    <section><h4>🎧 有声章节</h4><a href="#" data-play-ch="1">▶ 第01章 · 17:28</a><a href="#" data-play-ch="2">▶ 第02章 · 8:22</a></section>
     <section>
       <h4>⌨️ 快捷键</h4>
       <p><kbd>Space</kbd> 播放/暂停</p>
@@ -5802,39 +5784,9 @@ body.size-sm h2.chapter-h { font-size: 26px; }
 </div>
 
 <div class="scrim" id="scrim"></div>
-<aside class="drawer" id="drawer" aria-label="章节目录"><h3>目录 · 31 章</h3><ol><li><a href="#序"><span class="toc-num">01</span><span>序</span></a></li>
-<li><a href="#第一章-山上的人"><span class="toc-num">02</span><span>第一章 山上的人</span></a></li>
-<li><a href="#第二章-下山"><span class="toc-num">03</span><span>第二章 下山</span></a></li>
-<li><a href="#第三章-山海图"><span class="toc-num">04</span><span>第三章 山海图</span></a></li>
-<li><a href="#第四章-山下"><span class="toc-num">05</span><span>第四章 山下</span></a></li>
-<li><a href="#第五章-云台"><span class="toc-num">06</span><span>第五章 云台</span></a></li>
-<li><a href="#第六章-县衙"><span class="toc-num">07</span><span>第六章 县衙</span></a></li>
-<li><a href="#第七章-回山"><span class="toc-num">08</span><span>第七章 回山</span></a></li>
-<li><a href="#第八章-三年后"><span class="toc-num">09</span><span>第八章 三年后</span></a></li>
-<li><a href="#第九章-山下十年"><span class="toc-num">10</span><span>第九章 山下十年</span></a></li>
-<li><a href="#第十章-山海图"><span class="toc-num">11</span><span>第十章 山海图</span></a></li>
-<li><a href="#尾声"><span class="toc-num">12</span><span>尾声</span></a></li>
-<li><a href="#后记"><span class="toc-num">13</span><span>后记</span></a></li>
-<li><a href="#附录：听雪剑门小记"><span class="toc-num">14</span><span>附录：听雪剑门小记</span></a></li>
-<li><a href="#再附录：听雪剑门人物志"><span class="toc-num">15</span><span>再附录：听雪剑门人物志</span></a></li>
-<li><a href="#八、-公孙大娘他爹——公孙不喝"><span class="toc-num">16</span><span>八、 公孙大娘他爹——公孙不喝</span></a></li>
-<li><a href="#九、-梅也"><span class="toc-num">17</span><span>九、 梅也</span></a></li>
-<li><a href="#十、-不图"><span class="toc-num">18</span><span>十、 不图</span></a></li>
-<li><a href="#附录：本篇之后，还有后续"><span class="toc-num">19</span><span>附录：本篇之后，还有后续</span></a></li>
-<li><a href="#山海错·卷二：天下入山"><span class="toc-num">20</span><span>山海错·卷二：天下入山</span></a></li>
-<li><a href="#附录：方无咎后传·听雪剑门第二十代"><span class="toc-num">21</span><span>附录：方无咎后传·听雪剑门第二十代</span></a></li>
-<li><a href="#附录：方无咎后传·听雪剑门第二十一代"><span class="toc-num">22</span><span>附录：方无咎后传·听雪剑门第二十一代</span></a></li>
-<li><a href="#附录二：豆腐巷新事"><span class="toc-num">23</span><span>附录二：豆腐巷新事</span></a></li>
-<li><a href="#跋：方无咎死后"><span class="toc-num">24</span><span>跋：方无咎死后</span></a></li>
-<li><a href="#听雪剑门编年"><span class="toc-num">25</span><span>听雪剑门编年</span></a></li>
-<li><a href="#听雪剑门第十九代掌门语录"><span class="toc-num">26</span><span>听雪剑门第十九代掌门语录</span></a></li>
-<li><a href="#关于"><span class="toc-num">27</span><span>关于&quot;我&quot;的一些事</span></a></li>
-<li><a href="#一段未完成的话"><span class="toc-num">28</span><span>一段未完成的话</span></a></li>
-<li><a href="#后跋"><span class="toc-num">29</span><span>后跋</span></a></li>
-<li><a href="#山海错·卷三：雪山外传"><span class="toc-num">30</span><span>山海错·卷三：雪山外传</span></a></li>
-<li><a href="#终跋·写在最后"><span class="toc-num">31</span><span>终跋·写在最后</span></a></li></ol></aside>
+<aside class="drawer" id="drawer" aria-label="章节目录"><h3>目录 · 31 章</h3><ol><li><a href="#序"><span class="toc-num">01</span><span>序</span></a></li><li><a href="#第一章-山上的人"><span class="toc-num">02</span><span>第一章 山上的人</span><span class="toc-mic" title="本章有朗读">🔊</span></a></li><li><a href="#第二章-下山"><span class="toc-num">03</span><span>第二章 下山</span><span class="toc-mic" title="本章有朗读">🔊</span></a></li><li><a href="#第三章-山海图"><span class="toc-num">04</span><span>第三章 山海图</span></a></li><li><a href="#第四章-山下"><span class="toc-num">05</span><span>第四章 山下</span></a></li><li><a href="#第五章-云台"><span class="toc-num">06</span><span>第五章 云台</span></a></li><li><a href="#第六章-县衙"><span class="toc-num">07</span><span>第六章 县衙</span></a></li><li><a href="#第七章-回山"><span class="toc-num">08</span><span>第七章 回山</span></a></li><li><a href="#第八章-三年后"><span class="toc-num">09</span><span>第八章 三年后</span></a></li><li><a href="#第九章-山下十年"><span class="toc-num">10</span><span>第九章 山下十年</span></a></li><li><a href="#第十章-山海图"><span class="toc-num">11</span><span>第十章 山海图</span></a></li><li><a href="#尾声"><span class="toc-num">12</span><span>尾声</span></a></li><li><a href="#后记"><span class="toc-num">13</span><span>后记</span></a></li><li><a href="#附录：听雪剑门小记"><span class="toc-num">14</span><span>附录：听雪剑门小记</span></a></li><li><a href="#再附录：听雪剑门人物志"><span class="toc-num">15</span><span>再附录：听雪剑门人物志</span></a></li><li><a href="#八、-公孙大娘他爹——公孙不喝"><span class="toc-num">16</span><span>八、 公孙大娘他爹——公孙不喝</span></a></li><li><a href="#九、-梅也"><span class="toc-num">17</span><span>九、 梅也</span></a></li><li><a href="#十、-不图"><span class="toc-num">18</span><span>十、 不图</span></a></li><li><a href="#附录：本篇之后，还有后续"><span class="toc-num">19</span><span>附录：本篇之后，还有后续</span></a></li><li><a href="#山海错·卷二：天下入山"><span class="toc-num">20</span><span>山海错·卷二：天下入山</span></a></li><li><a href="#附录：方无咎后传·听雪剑门第二十代"><span class="toc-num">21</span><span>附录：方无咎后传·听雪剑门第二十代</span></a></li><li><a href="#附录：方无咎后传·听雪剑门第二十一代"><span class="toc-num">22</span><span>附录：方无咎后传·听雪剑门第二十一代</span></a></li><li><a href="#附录二：豆腐巷新事"><span class="toc-num">23</span><span>附录二：豆腐巷新事</span></a></li><li><a href="#跋：方无咎死后"><span class="toc-num">24</span><span>跋：方无咎死后</span></a></li><li><a href="#听雪剑门编年"><span class="toc-num">25</span><span>听雪剑门编年</span></a></li><li><a href="#听雪剑门第十九代掌门语录"><span class="toc-num">26</span><span>听雪剑门第十九代掌门语录</span></a></li><li><a href="#关于"><span class="toc-num">27</span><span>关于&quot;我&quot;的一些事</span></a></li><li><a href="#一段未完成的话"><span class="toc-num">28</span><span>一段未完成的话</span></a></li><li><a href="#后跋"><span class="toc-num">29</span><span>后跋</span></a></li><li><a href="#山海错·卷三：雪山外传"><span class="toc-num">30</span><span>山海错·卷三：雪山外传</span></a></li><li><a href="#终跋·写在最后"><span class="toc-num">31</span><span>终跋·写在最后</span></a></li></ol></aside>
 
-<audio id="audio" preload="metadata" src="audio/ch1.mp3"></audio>
+<audio id="audio" preload="metadata"></audio>
 
 <footer class="player" role="region" aria-label="播放器">
   <button id="back-10" class="player-btn player-mini" aria-label="后退 10 秒">
@@ -5858,6 +5810,10 @@ body.size-sm h2.chapter-h { font-size: 26px; }
     <div class="player-quote" id="quote">点击播放 · 开始同步朗读</div>
   </div>
   <div class="player-extra">
+    <select id="chapter-select" class="chapter-select" aria-label="选择章节">
+      <option value="1">第01章 · 17:28</option>
+<option value="2">第02章 · 8:22</option>
+    </select>
     <select id="speed" class="speed-select" aria-label="播放速度">
       <option value="0.8">0.8×</option>
       <option value="0.9">0.9×</option>
@@ -5888,15 +5844,90 @@ body.size-sm h2.chapter-h { font-size: 26px; }
   const curB        = $('cur-time-b');
   const dur         = $('dur-time');
   const durB        = $('dur-time-b');
+  const chLabel     = $('ch-label');
   const quoteEl     = $('quote');
   const speedSel    = $('speed');
+  const chSel       = $('chapter-select');
   const menuBtn     = $('menu-btn');
   const drawer      = $('drawer');
   const scrim       = $('scrim');
 
-  const paras    = Array.from(document.querySelectorAll('main.article p[data-t]'));
-  const sortedT  = paras.map(p => parseFloat(p.dataset.t));
+  // ── 当前章节状态 ──
+  let currentChapter = 0;   // 默认 0 = 第一章（数字 1）
+  let loadingChapter = false;
 
+  // 收集所有带 audio 的章节
+  const chapterMap = new Map();  // chapter_n -> mp3 url
+
+  chapterMap.set(1, "audio/ch1.mp3");
+  chapterMap.set(2, "audio/ch2.mp3");
+
+
+
+  // ── 段落数据：按 chapter 分组 ──
+  const paras = Array.from(document.querySelectorAll('main.article p[data-t]'));
+  // 每个段落的 chapter 与 t
+  paras.forEach(p => {
+    p.dataset.tNum = p.dataset.t;
+  });
+
+  function parasOf(chap){
+    return paras.filter(p => parseInt(p.dataset.chapter, 10) === chap);
+  }
+
+  function findActivePara(chap, t){
+    const list = parasOf(chap);
+    let lo = 0, hi = list.length - 1, idx = -1;
+    while (lo <= hi){
+      const mid = (lo + hi) >> 1;
+      if (parseFloat(list[mid].dataset.t) <= t){ idx = mid; lo = mid + 1; }
+      else hi = mid - 1;
+    }
+    return idx >= 0 ? list[idx] : null;
+  }
+
+  let activeP = null;
+  let lastP   = null;
+  let userScrollingTimer = null;
+  let autoFollow = true;
+
+  function clearHighlight(){
+    if (lastP){ lastP.classList.remove('reading','spoken'); lastP = null; }
+    activeP = null;
+    quoteEl.textContent = '点击播放 · 开始同步朗读';
+  }
+
+  function updateHighlight(t){
+    const curP = findActivePara(currentChapter, t);
+    if (!curP || curP === activeP) return;
+
+    if (lastP){ lastP.classList.remove('reading'); lastP.classList.add('spoken'); }
+    curP.classList.remove('spoken'); curP.classList.add('reading');
+    activeP = curP; lastP = curP;
+
+    const txt = curP.textContent.trim().replace(/\s+/g,' ').slice(0, 90);
+    quoteEl.textContent = txt;
+
+    if (autoFollow && !audio.paused){
+      const r = curP.getBoundingClientRect();
+      if (r.top < 90 || r.bottom > window.innerHeight - 140){
+        if (userScrollingTimer) return;
+        userScrollingTimer = setTimeout(()=>{
+          curP.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          userScrollingTimer = null;
+        }, 100);
+      }
+    }
+  }
+
+  let scrollTimer = null;
+  window.addEventListener('scroll', ()=>{
+    autoFollow = false;
+    clearTimeout(scrollTimer);
+    scrollTimer = setTimeout(()=>{ autoFollow = true; }, 5000);
+  }, { passive: true });
+
+  // ── 工具 ──
   function fmt(s){
     if (!isFinite(s) || s < 0) return '0:00';
     const m = Math.floor(s/60), x = Math.floor(s%60);
@@ -5919,7 +5950,16 @@ body.size-sm h2.chapter-h { font-size: 26px; }
 
   audio.addEventListener('play',  ()=> setPlayingIcon(true));
   audio.addEventListener('pause', ()=> setPlayingIcon(false));
-  audio.addEventListener('ended', ()=> { setPlayingIcon(false); clearHighlight(); });
+  audio.addEventListener('ended', ()=> {
+    setPlayingIcon(false);
+    // 自动跳下一章
+    const next = findNextAudioChapter(currentChapter);
+    if (next !== null && next !== currentChapter){
+      switchToChapter(next, true);
+    } else {
+      clearHighlight();
+    }
+  });
 
   audio.addEventListener('loadedmetadata', ()=>{
     const t = fmt(audio.duration);
@@ -5954,66 +5994,87 @@ body.size-sm h2.chapter-h { font-size: 26px; }
   bar.addEventListener('click',    e => seekFromEvent(bar,    e));
   topBar.addEventListener('click', e => seekFromEvent(topBar, e));
 
-  // ── 跟读高亮 + 引文 + 自动滚动 ──
-  let activeP = null;
-  let lastP = null;
-  let userScrollingTimer = null;
-  let autoFollow = true;
-
-  function clearHighlight(){
-    if (lastP){ lastP.classList.remove('reading','spoken'); lastP = null; }
-    activeP = null;
-    quoteEl.textContent = '';
-  }
-
-  function updateHighlight(t){
-    let lo = 0, hi = sortedT.length - 1, idx = -1;
-    while (lo <= hi){
-      const mid = (lo + hi) >> 1;
-      if (sortedT[mid] <= t){ idx = mid; lo = mid + 1; }
-      else hi = mid - 1;
-    }
-    if (idx < 0) return;
-    const curP = paras[idx];
-    if (curP === activeP) return;
-
-    if (lastP){ lastP.classList.remove('reading'); lastP.classList.add('spoken'); }
-    curP.classList.remove('spoken'); curP.classList.add('reading');
-    activeP = curP; lastP = curP;
-
-    const txt = curP.textContent.trim().replace(/\s+/g,' ').slice(0, 90);
-    quoteEl.textContent = txt;
-
-    if (autoFollow && !audio.paused){
-      const r = curP.getBoundingClientRect();
-      if (r.top < 90 || r.bottom > window.innerHeight - 140){
-        if (userScrollingTimer) return;
-        userScrollingTimer = setTimeout(()=>{
-          curP.scrollIntoView({ behavior: 'smooth', block: 'center' });
-          userScrollingTimer = null;
-        }, 100);
-      }
-    }
-  }
-
-  let scrollTimer = null;
-  window.addEventListener('scroll', ()=>{
-    autoFollow = false;
-    clearTimeout(scrollTimer);
-    scrollTimer = setTimeout(()=>{ autoFollow = true; }, 5000);
-  }, { passive: true });
-
-  // 点击段落：跳到该时间并播放
-  paras.forEach(p => { p.style.cursor = 'pointer'; });
+  // 段落点击：切到该段所属章节 + 跳转时间
   paras.forEach(p => {
     p.addEventListener('click', ()=>{
-      audio.currentTime = parseFloat(p.dataset.t);
+      const ch = parseInt(p.dataset.chapter, 10);
+      const t  = parseFloat(p.dataset.t);
+      switchToChapter(ch, false);
+      audio.currentTime = t;
       if (audio.paused) audio.play();
       autoFollow = true;
     });
   });
 
-  // 章节当前高亮（h2.chapter-h）
+  // ── 章节切换 ──
+  function switchToChapter(ch, autoplay){
+    if (!chapterMap.has(ch)) {
+      // 章节没音频，找下一个有的
+      const fallback = findNextAudioChapter(ch) ?? findPrevAudioChapter(ch);
+      if (fallback === null) {
+        // 没有任何有声章节，保持原状
+        return;
+      }
+      ch = fallback;
+    }
+    if (ch === currentChapter && !loadingChapter) {
+      // 同章节：可能仅是 highlight
+      updateHighlight(audio.currentTime);
+      return;
+    }
+    loadingChapter = true;
+    currentChapter = ch;
+    const src = chapterMap.get(ch);
+    audio.src = src;
+    audio.load();
+
+    // 更新章节标签（顶栏 + player）
+    const h2 = document.querySelector('h2.chapter-h[data-chapter="' + ch + '"]');
+    const title = h2 ? h2.textContent : '第 ' + (ch+1) + ' 章';
+    const titleEl = document.querySelector('.player-now .title');
+    if (titleEl) titleEl.textContent = title;
+    if (chLabel) {
+      // 顶栏短一点：第一章/第二章 ...
+      const m = title.match(/第[一二三四五六七八九十百千零〇\d]+章/);
+      chLabel.textContent = m ? m[0] : title;
+    }
+    if (chSel) chSel.value = String(ch);
+
+    audio.addEventListener('loadedmetadata', function onMeta(){
+      audio.removeEventListener('loadedmetadata', onMeta);
+      loadingChapter = false;
+      // 自动滚到章节开头
+      const h2 = document.querySelector('h2.chapter-h[data-chapter="' + ch + '"]');
+      if (h2 && autoplay !== false){
+        // 让用户能看到当前章节
+        // 不主动滚，避免突兀
+      }
+      audio.currentTime = 0;
+      if (autoplay) {
+        audio.play().catch(()=>{});
+      }
+    });
+    clearHighlight();
+  }
+
+  function findNextAudioChapter(fromCh){
+    const all = Array.from(chapterMap.keys()).sort((a,b)=>a-b);
+    return all.find(c => c > fromCh) ?? null;
+  }
+  function findPrevAudioChapter(fromCh){
+    const all = Array.from(chapterMap.keys()).sort((a,b)=>b-a);
+    return all.find(c => c < fromCh) ?? null;
+  }
+
+  // 章节下拉
+  if (chSel) {
+    chSel.addEventListener('change', () => {
+      const ch = parseInt(chSel.value, 10);
+      switchToChapter(ch, true);
+    });
+  }
+
+  // 章节跟踪（高亮当前章节在目录里）
   const chapterHs = Array.from(document.querySelectorAll('h2.chapter-h'));
   const tocLinks  = Array.from(document.querySelectorAll('.sidebar-toc a[href^="#"], .drawer a[href^="#"]'));
   const topLinks  = tocLinks.filter(a => a.closest('.sidebar-toc'));
@@ -6029,6 +6090,24 @@ body.size-sm h2.chapter-h { font-size: 26px; }
   }
   window.addEventListener('scroll', activeChapter, { passive: true });
   activeChapter();
+
+  // Hero 上的"立即听第一章"
+  const heroCta = document.querySelector('.hero .play-cta');
+  if (heroCta) heroCta.addEventListener('click', e => {
+    e.preventDefault();
+    if (chapterMap.size === 0) return;
+    const first = Math.min(...chapterMap.keys());
+    switchToChapter(first, true);
+  });
+
+  // h2.chapter-h 上的"本章有朗读"点击
+  document.querySelectorAll('h2.chapter-h[data-audio="1"]').forEach(h => {
+    h.style.cursor = 'pointer';
+    h.addEventListener('click', () => {
+      const ch = parseInt(h.dataset.chapter, 10);
+      switchToChapter(ch, true);
+    });
+  });
 
   // 字号
   const SIZES  = ['','size-sm','size-lg'];
@@ -6072,15 +6151,15 @@ body.size-sm h2.chapter-h { font-size: 26px; }
     else if (e.code === 'ArrowRight'){ audio.currentTime = Math.min((audio.duration||0)+1, audio.currentTime + 5); }
   });
 
-  // Hero CTA 触发播放
-  const heroCta = document.querySelector('.hero .play-cta');
-  if (heroCta) heroCta.addEventListener('click', e => {
-    e.preventDefault();
-    if (audio.paused) audio.play();
-    else audio.currentTime = 0;
-  });
-
   setPlayingIcon(false);
+  // 初始章节标签
+  setTimeout(() => {
+    const h2 = document.querySelector('h2.chapter-h[data-chapter="0"]');
+    if (h2 && chLabel) {
+      const m = h2.textContent.match(/第[一二三四五六七八九十百千零〇\d]+章/);
+      chLabel.textContent = m ? m[0] : h2.textContent;
+    }
+  }, 0);
 })();
 </script>
 </body>
