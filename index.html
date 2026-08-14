@@ -2,277 +2,617 @@
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>山海错</title>
-<meta name="description" content="一部仿韩寒《长安乱》风格的中篇武侠小说">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>山海错 · 一部仿韩寒《长安乱》风格的小说</title>
+<meta name="description" content="《山海错》—— 一部仿韩寒《长安乱》风格的中篇武侠小说，附带同步朗读">
+<meta name="theme-color" content="#f6efdf">
 <link rel="preload" href="audio/ch1.mp3" as="audio">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%23a93226'/%3E%3Ctext x='16' y='23' text-anchor='middle' fill='white' font-family='serif' font-weight='700' font-size='20'%3E错%3C/text%3E%3C/svg%3E">
 <style>
 :root {
-  --bg: #f7f3eb;
-  --paper: #fbf8f1;
-  --ink: #2b2418;
-  --ink-soft: #5a4e3a;
-  --accent: #8b3a2a;
-  --rule: #d9cfb8;
-  --shadow: rgba(50, 30, 10, 0.08);
+  --bg:        #f6efdf;
+  --paper:     #fbf6e9;
+  --ink:       #1f1a14;
+  --ink-soft:  #5e5243;
+  --ink-faint: #8a7a64;
+  --accent:    #a93226;
+  --accent-soft: #c05545;
+  --rule:      #d4c8a8;
+  --rule-soft: #ebe1c6;
+  --highlight: rgba(169, 50, 38, 0.07);
+  --highlight-strong: rgba(169, 50, 38, 0.16);
+  --shadow:    0 1px 3px rgba(50, 30, 10, 0.06), 0 12px 32px rgba(50, 30, 10, 0.08);
+  --serif:     "Source Han Serif SC", "Songti SC", "Noto Serif CJK SC", "STSong", "PingFang SC", serif;
+  --sans:      "PingFang SC", "Hiragino Sans GB", "Source Han Sans SC", system-ui, sans-serif;
+}
+html.dark {
+  --bg:        #14110b;
+  --paper:     #1c1812;
+  --ink:       #ece1c5;
+  --ink-soft:  #b8a78a;
+  --ink-faint: #7a6a55;
+  --accent:    #d97560;
+  --accent-soft: #e89176;
+  --rule:      #3a3022;
+  --rule-soft: #2a221a;
+  --highlight: rgba(217, 117, 96, 0.10);
+  --highlight-strong: rgba(217, 117, 96, 0.22);
+  --shadow:    0 1px 3px rgba(0,0,0,0.4), 0 12px 32px rgba(0,0,0,0.3);
 }
 
-* { box-sizing: border-box; }
-
+*,*::before,*::after { box-sizing: border-box; }
 html, body {
-  margin: 0;
-  padding: 0;
-  background: var(--bg);
-  color: var(--ink);
-  font-family: "PingFang SC", "Hiragino Sans GB", "Source Han Serif SC",
-               "Noto Serif CJK SC", "Songti SC", "STSong", serif;
-  line-height: 1.9;
+  margin: 0; padding: 0;
+  background: var(--bg); color: var(--ink);
+  font-family: var(--serif);
+  line-height: 2;
   font-size: 18px;
   -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  scroll-behavior: smooth;
 }
+body { padding-bottom: 110px; }
+a { color: var(--accent); text-decoration: none; }
+a:hover { background: var(--highlight); }
+button { font-family: var(--sans); cursor: pointer; }
+::selection { background: var(--accent); color: #fff; }
 
-.page {
-  max-width: 760px;
-  margin: 0 auto;
-  padding: 60px 28px 100px;
-  background: var(--paper);
-  min-height: 100vh;
-  box-shadow: 0 0 40px var(--shadow);
+/* === topbar === */
+.topbar {
+  position: fixed; top: 0; left: 0; right: 0;
+  height: 60px; padding: 0 24px;
+  display: flex; align-items: center; gap: 14px;
+  background: rgba(246, 239, 223, 0.86);
+  backdrop-filter: saturate(160%) blur(16px);
+  -webkit-backdrop-filter: saturate(160%) blur(16px);
+  border-bottom: 1px solid var(--rule);
+  z-index: 100;
 }
-
-h1, h2, h3 {
-  font-weight: 700;
-  color: var(--ink);
-  letter-spacing: 0.02em;
-}
-
-h1 {
-  font-size: 38px;
-  text-align: center;
-  margin: 0 0 20px;
-  padding-bottom: 24px;
-  border-bottom: 2px solid var(--rule);
-}
-
-h2 {
-  font-size: 26px;
-  margin: 56px 0 18px;
-  padding: 12px 0 8px;
-  border-bottom: 1px dashed var(--rule);
+html.dark .topbar { background: rgba(20, 17, 11, 0.86); }
+.topbar .brand {
+  font-family: var(--serif); font-weight: 700;
+  font-size: 18px; letter-spacing: 0.05em;
   color: var(--accent);
 }
-
-h3 {
-  font-size: 20px;
-  margin: 28px 0 10px;
+.topbar .brand small {
+  display: block; font-family: var(--sans);
+  font-weight: 400; font-size: 11px;
+  letter-spacing: 0.1em;
+  color: var(--ink-faint);
+  margin-top: -2px;
+}
+.topbar-spacer { flex: 1; }
+.progress-wrap {
+  flex: 1; max-width: 360px; height: 4px;
+  background: var(--rule-soft);
+  border-radius: 2px; overflow: hidden;
+  position: relative; cursor: pointer;
+}
+.progress-fill {
+  height: 100%; width: 0%;
+  background: linear-gradient(90deg, var(--accent), var(--accent-soft));
+  transition: width 0.2s linear;
+}
+.progress-time {
+  font-family: var(--sans); font-size: 12px;
   color: var(--ink-soft);
+  min-width: 96px; text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+.icon-btn {
+  background: transparent;
+  border: 1px solid var(--rule);
+  border-radius: 999px;
+  width: 38px; height: 38px;
+  color: var(--ink-soft);
+  display: inline-flex; align-items: center; justify-content: center;
+  transition: all 0.15s;
+}
+.icon-btn:hover { background: var(--accent); color: #fff; border-color: var(--accent); }
+.icon-btn svg { width: 18px; height: 18px; }
+.menu-btn {
+  display: none;
+  background: transparent;
+  border: 1px solid var(--rule);
+  border-radius: 6px;
+  width: 40px; height: 38px;
+  color: var(--ink-soft);
+  align-items: center; justify-content: center;
 }
 
-h4, h5, h6 {
+/* === layout === */
+.layout {
+  display: grid;
+  grid-template-columns: 240px minmax(0, 1fr) 280px;
+  gap: 36px;
+  max-width: 1240px;
+  margin: 60px auto 0;
+  padding: 40px 28px 40px;
+  align-items: start;
+}
+
+/* === 左侧目录 === */
+.sidebar-toc {
+  position: sticky; top: 92px;
+  padding: 14px 0;
+  border-right: 1px solid var(--rule-soft);
+  padding-right: 16px;
+  font-family: var(--sans);
+  font-size: 13px;
+}
+.sidebar-toc h3 {
+  margin: 0 0 16px;
+  font-family: var(--serif);
   font-size: 17px;
-  margin: 18px 0 8px;
-  color: var(--ink-soft);
+  color: var(--accent);
+  letter-spacing: 0.1em;
 }
+.sidebar-toc ol { list-style: none; padding: 0; margin: 0; max-height: calc(100vh - 200px); overflow-y: auto; }
+.sidebar-toc li { margin: 0; }
+.sidebar-toc li a {
+  display: flex; gap: 10px;
+  padding: 8px 10px;
+  border-radius: 6px;
+  color: var(--ink-soft);
+  border: none;
+  line-height: 1.5;
+  align-items: baseline;
+}
+.sidebar-toc li a:hover { background: var(--highlight); color: var(--accent); }
+.sidebar-toc li a.active { background: var(--highlight-strong); color: var(--accent); font-weight: 600; }
+.toc-num { font-variant-numeric: tabular-nums; font-size: 11px; color: var(--ink-faint); min-width: 22px; }
+.sidebar-toc .toc-title { flex: 1; }
+.sidebar-toc::-webkit-scrollbar { width: 4px; }
+.sidebar-toc::-webkit-scrollbar-thumb { background: var(--rule); border-radius: 2px; }
 
-p {
-  margin: 12px 0;
+/* === 主文章 === */
+main.article {
+  background: var(--paper);
+  padding: 60px 56px 80px;
+  border-radius: 6px;
+  box-shadow: var(--shadow);
+  min-width: 0;
+}
+.hero {
+  text-align: center;
+  padding-bottom: 40px;
+  border-bottom: 1px solid var(--rule);
+  margin-bottom: 56px;
+}
+.hero h1 {
+  font-size: 48px;
+  margin: 0 0 16px;
+  letter-spacing: 0.15em;
+  color: var(--ink);
+  font-weight: 700;
+  position: relative;
+  display: inline-block;
+}
+.hero h1::before, .hero h1::after {
+  content: '';
+  display: inline-block;
+  width: 28px; height: 1px;
+  background: var(--accent);
+  vertical-align: middle;
+  margin: 0 16px;
+}
+.hero .book-sub {
+  color: var(--ink-faint);
+  font-family: var(--sans);
+  font-size: 12px;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  margin: 12px 0 0;
+  text-indent: 0;
+}
+.hero .book-meta {
+  margin-top: 24px;
+  display: flex; justify-content: center; gap: 18px;
+  font-family: var(--sans);
+  font-size: 12px;
+  color: var(--ink-faint);
+  text-indent: 0;
+}
+.hero .book-meta strong { color: var(--ink); }
+.hero .play-cta {
+  display: inline-flex; gap: 8px; align-items: center;
+  margin-top: 28px; padding: 10px 22px;
+  border: 1px solid var(--accent);
+  background: var(--accent);
+  color: #fff;
+  border-radius: 999px;
+  font-family: var(--sans);
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+}
+.hero .play-cta:hover { background: var(--accent-soft); border-color: var(--accent-soft); color: #fff; }
+
+main.article h2.chapter-h {
+  font-size: 28px;
+  margin: 64px 0 24px;
+  padding: 18px 0 12px;
+  border-bottom: 2px solid var(--accent);
+  color: var(--accent);
+  letter-spacing: 0.05em;
+  position: relative;
+  scroll-margin-top: 96px;
+}
+main.article h2.chapter-h::before {
+  content: '';
+  display: inline-block;
+  width: 12px; height: 12px;
+  background: var(--accent);
+  margin-right: 14px;
+  vertical-align: 3px;
+  border-radius: 2px;
+}
+main.article h3 {
+  font-size: 20px;
+  margin: 36px 0 12px;
+  color: var(--ink);
+  border-left: 3px solid var(--accent);
+  padding-left: 12px;
+}
+main.article h4 {
+  font-size: 17px;
+  color: var(--ink-soft);
+  margin: 28px 0 8px;
+  font-weight: 600;
+}
+main.article p {
+  margin: 14px 0;
   text-indent: 2em;
   text-align: justify;
+  text-justify: inter-ideograph;
+  position: relative;
+  padding: 3px 6px;
+  margin-left: -6px;
+  margin-right: -6px;
+  border-radius: 4px;
+  transition: background 0.45s ease, color 0.45s ease;
 }
-
-p:empty { display: none; }
-
-hr {
+main.article p[data-t] { scroll-margin-top: 120px; }
+main.article p.reading { background: var(--highlight-strong); }
+main.article p.spoken { background: var(--highlight); }
+main.article hr {
   border: none;
   border-top: 1px dashed var(--rule);
   margin: 40px auto;
   width: 60%;
 }
-
-strong {
-  color: var(--accent);
-  font-weight: 700;
+main.article strong { color: var(--accent); font-weight: 700; }
+main.article em {
+  color: var(--ink-soft); font-style: normal;
+  background: linear-gradient(transparent 60%, rgba(169,50,38,0.12) 60%);
+  padding: 0 2px;
 }
-
-code {
+main.article code {
   font-family: "Menlo", "Consolas", monospace;
-  background: rgba(139, 58, 42, 0.08);
-  padding: 1px 6px;
-  border-radius: 3px;
-  font-size: 0.9em;
+  background: var(--rule-soft);
+  padding: 1px 6px; border-radius: 3px; font-size: 0.9em;
 }
 
-em { color: var(--ink-soft); }
-
-a {
-  color: var(--accent);
-  text-decoration: none;
-  border-bottom: 1px dotted var(--accent);
-}
-
-a:hover { background: rgba(139, 58, 42, 0.08); }
-
-/* ---------- 顶栏 ---------- */
-.topbar {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  background: rgba(247, 243, 235, 0.94);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  border-bottom: 1px solid var(--rule);
-  z-index: 100;
-  padding: 10px 24px;
+.chapter-meta-bar {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-  font-size: 14px;
-  color: var(--ink-soft);
-}
-
-.topbar .title { font-weight: 700; color: var(--accent); }
-
-.controls button {
-  font-family: inherit;
-  background: transparent;
-  border: 1px solid var(--rule);
-  border-radius: 4px;
-  padding: 4px 12px;
-  margin-left: 6px;
-  cursor: pointer;
-  color: var(--ink-soft);
-  font-size: 13px;
-  transition: all 0.15s ease;
-}
-.controls button:hover {
-  background: var(--accent);
-  color: #fff;
-  border-color: var(--accent);
-}
-
-.page { margin-top: 60px; }
-
-/* ---------- 章节导航 ---------- */
-.toc {
-  background: rgba(139, 58, 42, 0.04);
+  justify-content: space-between; align-items: center;
+  margin: 24px 0 32px;
+  padding: 12px 14px;
+  background: rgba(169,50,38,0.05);
   border-left: 3px solid var(--accent);
-  padding: 18px 24px 18px 28px;
-  margin: 30px 0 40px;
-  border-radius: 2px;
-  font-size: 16px;
-}
-
-.toc h3 {
-  margin: 0 0 12px;
-  font-size: 18px;
-  color: var(--accent);
-}
-
-.toc ul {
-  margin: 0;
-  padding-left: 0;
-  list-style: none;
-}
-
-.toc li {
-  padding: 4px 0;
-  text-indent: 0;
-}
-
-.toc a {
-  border: none;
-  color: var(--ink);
-}
-
-.toc a:hover { color: var(--accent); }
-
-/* ---------- 字号按钮 ---------- */
-body.large { font-size: 20px; }
-body.large h1 { font-size: 44px; }
-body.large h2 { font-size: 30px; }
-
-body.small { font-size: 16px; }
-body.small h1 { font-size: 34px; }
-body.small h2 { font-size: 22px; }
-
-body.dark {
-  --bg: #1a1612;
-  --paper: #221d18;
-  --ink: #e8dcc4;
-  --ink-soft: #a89878;
-  --accent: #d4876f;
-  --rule: #3a2e22;
-  --shadow: rgba(0, 0, 0, 0.5);
-}
-
-/* ---------- 端 ---------- */
-.audio-player {
-  background: rgba(139, 58, 42, 0.06);
-  border: 1px solid var(--rule);
-  border-radius: 8px;
-  padding: 24px 28px;
-  margin: 40px 0;
-  text-align: center;
-}
-.audio-player h3 {
-  color: var(--accent);
-  margin: 0 0 8px;
-  font-size: 20px;
-}
-.audio-player .player-meta {
-  font-size: 14px;
-  color: var(--ink-soft);
-  text-indent: 0;
-  margin: 0 0 16px;
-}
-.audio-player audio {
-  width: 100%;
-  margin: 16px 0 8px;
-}
-.audio-player .player-tip {
+  border-radius: 0 6px 6px 0;
+  font-family: var(--sans);
   font-size: 13px;
   color: var(--ink-soft);
   text-indent: 0;
-  margin: 8px 0 0;
-  line-height: 1.6;
 }
+.chapter-meta-bar strong { color: var(--ink); }
+.chapter-meta-bar a { border: none; color: var(--accent); }
 
-body.dark .audio-player {
-  background: rgba(212, 135, 111, 0.08);
-  border-color: #4a3a2a;
+/* === 右侧栏 === */
+.sidebar-right { position: sticky; top: 92px; font-family: var(--sans); font-size: 13px; }
+.sidebar-right section {
+  background: var(--paper);
+  border: 1px solid var(--rule);
+  border-radius: 6px;
+  padding: 16px 18px;
+  margin-bottom: 14px;
+  box-shadow: var(--shadow);
 }
-
-.colophon {
-  margin-top: 80px;
-  padding-top: 30px;
-  border-top: 2px double var(--rule);
-  text-align: center;
+.sidebar-right h4 {
+  margin: 0 0 10px;
+  font-family: var(--serif);
   font-size: 14px;
+  color: var(--accent);
+  letter-spacing: 0.05em;
+}
+.sidebar-right p { color: var(--ink-soft); margin: 0 0 6px; line-height: 1.6; }
+.sidebar-right a {
+  display: block; padding: 4px 0;
+  color: var(--ink-soft); border: none;
+}
+.sidebar-right a:hover { color: var(--accent); }
+.sidebar-right kbd {
+  display: inline-block;
+  border: 1px solid var(--rule);
+  border-bottom-width: 2px;
+  border-radius: 4px;
+  padding: 1px 6px;
+  font-family: var(--sans);
+  font-size: 11px;
+  background: var(--bg);
   color: var(--ink-soft);
-  text-indent: 0;
+  margin: 0 2px;
 }
 
-@media (max-width: 720px) {
+/* === 播放器 === */
+.player {
+  position: fixed; bottom: 0; left: 0; right: 0;
+  background: rgba(246, 239, 223, 0.96);
+  backdrop-filter: saturate(160%) blur(20px);
+  -webkit-backdrop-filter: saturate(160%) blur(20px);
+  border-top: 1px solid var(--rule);
+  padding: 12px 24px 16px;
+  z-index: 90;
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+html.dark .player { background: rgba(20, 17, 11, 0.96); }
+.player-btn {
+  width: 44px; height: 44px;
+  border-radius: 999px; border: none;
+  background: var(--accent); color: #fff;
+  display: inline-flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+  transition: transform 0.1s, background 0.15s;
+  box-shadow: 0 2px 8px rgba(169, 50, 38, 0.3);
+}
+.player-btn:hover { background: var(--accent-soft); }
+.player-btn:active { transform: scale(0.96); }
+.player-btn svg { width: 18px; height: 18px; }
+.player-mini {
+  width: 36px; height: 36px;
+  background: transparent; color: var(--ink-soft);
+  border: 1px solid var(--rule); box-shadow: none;
+}
+.player-mini:hover { background: var(--accent); color: #fff; border-color: var(--accent); }
+.player-info {
+  flex: 1; min-width: 0;
+  display: flex; flex-direction: column; gap: 6px;
+}
+.player-now {
+  font-family: var(--sans); font-size: 13px;
+  color: var(--ink-soft);
+  display: flex; justify-content: space-between; gap: 12px;
+}
+.player-now .title { font-weight: 600; color: var(--ink); }
+.player-now .timer { font-variant-numeric: tabular-nums; font-size: 12px; }
+.player-bar {
+  height: 4px;
+  background: var(--rule-soft);
+  border-radius: 2px; overflow: hidden;
+  cursor: pointer; position: relative;
+}
+.player-bar-fill {
+  height: 100%; width: 0%;
+  background: linear-gradient(90deg, var(--accent), var(--accent-soft));
+  transition: width 0.15s linear;
+}
+.player-bar-buf {
+  position: absolute; top: 0; left: 0;
+  height: 100%; width: 0;
+  background: var(--rule); opacity: 0.5;
+}
+.player-quote {
+  font-family: var(--serif);
+  font-size: 13px;
+  color: var(--ink-soft);
+  font-style: italic;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  min-height: 18px;
+  padding: 0 4px;
+}
+.player-quote::before { content: "「"; color: var(--accent); margin-right: 2px; }
+.player-quote::after { content: "」"; color: var(--accent); margin-left: 2px; }
+
+.player-extra { display: flex; gap: 6px; align-items: center; flex-shrink: 0; }
+.speed-select {
+  font-family: var(--sans); font-size: 12px;
+  border: 1px solid var(--rule);
+  background: transparent; color: var(--ink-soft);
+  border-radius: 999px;
+  padding: 4px 10px; cursor: pointer;
+}
+
+/* === 端 === */
+.colophon {
+  margin-top: 60px;
+  padding-top: 28px;
+  border-top: 1px dashed var(--rule);
+  text-align: center;
+  font-family: var(--sans);
+  font-size: 12px;
+  color: var(--ink-faint);
+  text-indent: 0;
+  letter-spacing: 0.05em;
+}
+.colophon .stamp {
+  display: inline-block;
+  border: 2px solid var(--accent);
+  color: var(--accent);
+  padding: 4px 14px;
+  margin-top: 8px;
+  font-weight: 600;
+  letter-spacing: 0.3em;
+  transform: rotate(-2deg);
+  opacity: 0.85;
+}
+
+/* === 字号档 === */
+body.size-lg { font-size: 20px; }
+body.size-lg main.article h1 { font-size: 56px; }
+body.size-lg h2.chapter-h { font-size: 32px; }
+
+body.size-sm { font-size: 16px; }
+body.size-sm main.article h1 { font-size: 42px; }
+body.size-sm h2.chapter-h { font-size: 26px; }
+
+/* === 移动端 === */
+@media (max-width: 1023px) {
+  .layout {
+    grid-template-columns: 1fr;
+    padding: 32px 18px 60px;
+    gap: 0;
+  }
+  .sidebar-toc, .sidebar-right { display: none; }
+  main.article { padding: 36px 24px 60px; }
+  .menu-btn { display: inline-flex; }
+  .progress-wrap { max-width: none; }
+
+  .scrim {
+    position: fixed; inset: 60px 0 110px 0;
+    background: rgba(0,0,0,0.4);
+    opacity: 0; pointer-events: none;
+    z-index: 70;
+    transition: opacity 0.3s ease;
+  }
+  .scrim.open { opacity: 1; pointer-events: auto; }
+  .drawer {
+    position: fixed;
+    top: 60px; left: 0; bottom: 110px;
+    width: 84%; max-width: 320px;
+    background: var(--paper);
+    border-right: 1px solid var(--rule);
+    padding: 24px;
+    overflow-y: auto;
+    transform: translateX(-100%);
+    transition: transform 0.3s ease;
+    z-index: 80;
+    box-shadow: 4px 0 24px rgba(0,0,0,0.15);
+  }
+  .drawer.open { transform: translateX(0); }
+  .drawer h3 {
+    font-family: var(--serif);
+    color: var(--accent);
+    font-size: 20px;
+    margin: 0 0 20px;
+    letter-spacing: 0.1em;
+  }
+  .drawer ol { list-style: none; padding: 0; margin: 0; }
+  .drawer li a {
+    display: flex; gap: 12px;
+    padding: 12px 8px;
+    border-radius: 6px;
+    color: var(--ink);
+    border-bottom: 1px solid var(--rule-soft);
+    font-family: var(--sans);
+    font-size: 14px;
+  }
+  .drawer .toc-num { color: var(--ink-faint); }
+}
+
+@media (max-width: 640px) {
+  body { font-size: 17px; }
+  main.article { padding: 28px 18px 60px; }
+  main.article h1 { font-size: 36px; letter-spacing: 0.05em; }
+  h2.chapter-h { font-size: 22px !important; }
+  main.article p { text-indent: 2em; padding: 4px 0; margin-left: 0; margin-right: 0; }
+  .topbar { padding: 0 12px; gap: 8px; height: 56px; }
+  .topbar .brand { font-size: 16px; }
+  .topbar .brand small { display: none; }
+  .topbar-spacer { display: none; }
+  .progress-wrap { flex: 1; }
+  .progress-time { display: none; }
+  .player { padding: 10px 12px 12px; gap: 8px; height: 100px; }
+  .player-info { gap: 4px; }
+  .player-quote { display: none; }
+  .speed-select { display: none; }
+  .chapter-meta-bar { flex-direction: column; gap: 8px; align-items: flex-start; }
+  .hero h1 { font-size: 32px !important; }
+  .hero h1::before, .hero h1::after { width: 16px; margin: 0 8px; }
+  .play-cta { font-size: 12px !important; padding: 8px 16px !important; }
+}
+
+@media (max-width: 380px) {
   body { font-size: 16px; }
-  .page { padding: 80px 16px 80px; }
-  h1 { font-size: 28px; }
-  h2 { font-size: 22px; }
+  main.article { padding: 24px 14px 60px; }
+  .hero h1 { font-size: 28px !important; }
 }
 </style>
 </head>
 <body>
-<div class="topbar">
-  <span class="title">山海错 · 一部仿长安乱风格的小说</span>
-  <span class="controls">
-    <button id="toggle-size" title="切换字号">字号</button>
-    <button id="toggle-theme" title="切换日夜间">夜间</button>
-    <button id="back-top" title="回到顶部">↑ 顶部</button>
-  </span>
-</div>
-<article class="page">
-<h1 id="山海错">山海错</h1>
-<h2 id="序">序</h2>
+
+<header class="topbar" role="banner">
+  <button id="menu-btn" class="menu-btn" aria-label="章节目录">
+    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 6h18v2H3zM3 11h18v2H3zM3 16h18v2H3z"/></svg>
+  </button>
+  <div class="brand">山海错<small>仿 · 长安乱</small></div>
+  <div class="topbar-spacer"></div>
+  <div class="progress-wrap" title="点击跳转">
+    <div class="progress-fill" id="top-fill"></div>
+  </div>
+  <div class="progress-time"><span id="cur-time">0:00</span> / <span id="dur-time">--:--</span></div>
+  <button id="size-btn" class="icon-btn" aria-label="字号">
+    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M9 4v3h5v12h3V7h5V4H9zm-6 8h3v7h3v-7h3V9H3v3z"/></svg>
+  </button>
+  <button id="theme-btn" class="icon-btn" aria-label="切换夜间">
+    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 3a9 9 0 109 9 7 7 0 01-9-9z"/></svg>
+  </button>
+</header>
+
+<div class="layout">
+
+  <nav class="sidebar-toc" aria-label="章节目录"><h3>目录 · 31 章</h3><ol><li><a href="#序"><span class="toc-num">01</span><span class="toc-title">序</span></a></li>
+<li><a href="#第一章-山上的人"><span class="toc-num">02</span><span class="toc-title">第一章 山上的人</span></a></li>
+<li><a href="#第二章-下山"><span class="toc-num">03</span><span class="toc-title">第二章 下山</span></a></li>
+<li><a href="#第三章-山海图"><span class="toc-num">04</span><span class="toc-title">第三章 山海图</span></a></li>
+<li><a href="#第四章-山下"><span class="toc-num">05</span><span class="toc-title">第四章 山下</span></a></li>
+<li><a href="#第五章-云台"><span class="toc-num">06</span><span class="toc-title">第五章 云台</span></a></li>
+<li><a href="#第六章-县衙"><span class="toc-num">07</span><span class="toc-title">第六章 县衙</span></a></li>
+<li><a href="#第七章-回山"><span class="toc-num">08</span><span class="toc-title">第七章 回山</span></a></li>
+<li><a href="#第八章-三年后"><span class="toc-num">09</span><span class="toc-title">第八章 三年后</span></a></li>
+<li><a href="#第九章-山下十年"><span class="toc-num">10</span><span class="toc-title">第九章 山下十年</span></a></li>
+<li><a href="#第十章-山海图"><span class="toc-num">11</span><span class="toc-title">第十章 山海图</span></a></li>
+<li><a href="#尾声"><span class="toc-num">12</span><span class="toc-title">尾声</span></a></li>
+<li><a href="#后记"><span class="toc-num">13</span><span class="toc-title">后记</span></a></li>
+<li><a href="#附录：听雪剑门小记"><span class="toc-num">14</span><span class="toc-title">附录：听雪剑门小记</span></a></li>
+<li><a href="#再附录：听雪剑门人物志"><span class="toc-num">15</span><span class="toc-title">再附录：听雪剑门人物志</span></a></li>
+<li><a href="#八、-公孙大娘他爹——公孙不喝"><span class="toc-num">16</span><span class="toc-title">八、 公孙大娘他爹——公孙不喝</span></a></li>
+<li><a href="#九、-梅也"><span class="toc-num">17</span><span class="toc-title">九、 梅也</span></a></li>
+<li><a href="#十、-不图"><span class="toc-num">18</span><span class="toc-title">十、 不图</span></a></li>
+<li><a href="#附录：本篇之后，还有后续"><span class="toc-num">19</span><span class="toc-title">附录：本篇之后，还有后续</span></a></li>
+<li><a href="#山海错·卷二：天下入山"><span class="toc-num">20</span><span class="toc-title">山海错·卷二：天下入山</span></a></li>
+<li><a href="#附录：方无咎后传·听雪剑门第二十代"><span class="toc-num">21</span><span class="toc-title">附录：方无咎后传·听雪剑门第二十代</span></a></li>
+<li><a href="#附录：方无咎后传·听雪剑门第二十一代"><span class="toc-num">22</span><span class="toc-title">附录：方无咎后传·听雪剑门第二十一代</span></a></li>
+<li><a href="#附录二：豆腐巷新事"><span class="toc-num">23</span><span class="toc-title">附录二：豆腐巷新事</span></a></li>
+<li><a href="#跋：方无咎死后"><span class="toc-num">24</span><span class="toc-title">跋：方无咎死后</span></a></li>
+<li><a href="#听雪剑门编年"><span class="toc-num">25</span><span class="toc-title">听雪剑门编年</span></a></li>
+<li><a href="#听雪剑门第十九代掌门语录"><span class="toc-num">26</span><span class="toc-title">听雪剑门第十九代掌门语录</span></a></li>
+<li><a href="#关于"><span class="toc-num">27</span><span class="toc-title">关于&quot;我&quot;的一些事</span></a></li>
+<li><a href="#一段未完成的话"><span class="toc-num">28</span><span class="toc-title">一段未完成的话</span></a></li>
+<li><a href="#后跋"><span class="toc-num">29</span><span class="toc-title">后跋</span></a></li>
+<li><a href="#山海错·卷三：雪山外传"><span class="toc-num">30</span><span class="toc-title">山海错·卷三：雪山外传</span></a></li>
+<li><a href="#终跋·写在最后"><span class="toc-num">31</span><span class="toc-title">终跋·写在最后</span></a></li></ol></nav>
+
+  <main class="article">
+    <div class="hero">
+      <h1>山海错</h1>
+      <p class="book-sub">仿 · 韩寒 · 长安乱 · 风格中篇</p>
+      <div class="book-meta">
+        <span>全本 <strong>32</strong> 章</span>
+        <span>·</span>
+        <span>约 <strong>10</strong> 万字</span>
+        <span>·</span>
+        <span>第一章有同步朗读</span>
+      </div>
+      <a href="#" class="play-cta">
+        <svg viewBox="0 0 24 24" fill="currentColor" width="14" height="14"><path d="M8 5v14l11-7z"/></svg>
+        立即听第一章（17 分钟）
+      </a>
+    </div>
+
+    <h2 class="chapter-h" data-chapter="0" id="序">序</h2>
 <p>我师父在我八岁那年跟我说，山上没前途的。</p>
 <p>那时候我不信。</p>
 <p>后来我十七岁那年他又说了一遍，我也没信。</p>
@@ -286,124 +626,92 @@ body.dark .audio-player {
 <p>我之所以讲这些，是因为后来江湖上传言，听雪剑门里藏着一幅山海图。图里画着什么，没人说得清。有人说是一座金山，有人说是一本剑谱，有人说是当年某位公主出奔前埋的一箱子珠宝。你说这些说法有什么共同点，共同点就是谁都没见过。</p>
 <p>而我，作为听雪剑门最不像样的一任掌门，也就莫名其妙成了这山海图的主人。</p>
 <p>但你要是读下去，你会发现我这个人，是最不可能握住任何秘密的那种人。</p>
-<div class="toc"><h3>目录</h3><ul>
-<li><a href="#序">序</a></li>
-<li><a href="#第一章-山上的人">第一章 山上的人</a></li>
-<li><a href="#第二章-下山">第二章 下山</a></li>
-<li><a href="#第三章-山海图">第三章 山海图</a></li>
-<li><a href="#第四章-山下">第四章 山下</a></li>
-<li><a href="#第五章-云台">第五章 云台</a></li>
-<li><a href="#第六章-县衙">第六章 县衙</a></li>
-<li><a href="#第七章-回山">第七章 回山</a></li>
-<li><a href="#第八章-三年后">第八章 三年后</a></li>
-<li><a href="#第九章-山下十年">第九章 山下十年</a></li>
-<li><a href="#第十章-山海图">第十章 山海图</a></li>
-<li><a href="#尾声">尾声</a></li>
-<li><a href="#后记">后记</a></li>
-<li><a href="#附录：听雪剑门小记">附录：听雪剑门小记</a></li>
-<li><a href="#再附录：听雪剑门人物志">再附录：听雪剑门人物志</a></li>
-<li><a href="#八、-公孙大娘他爹——公孙不喝">八、 公孙大娘他爹——公孙不喝</a></li>
-<li><a href="#九、-梅也">九、 梅也</a></li>
-<li><a href="#十、-不图">十、 不图</a></li>
-<li><a href="#附录：本篇之后，还有后续">附录：本篇之后，还有后续</a></li>
-<li><a href="#山海错·卷二：天下入山">山海错·卷二：天下入山</a></li>
-<li><a href="#附录：方无咎后传·听雪剑门第二十代">附录：方无咎后传·听雪剑门第二十代</a></li>
-<li><a href="#附录：方无咎后传·听雪剑门第二十一代">附录：方无咎后传·听雪剑门第二十一代</a></li>
-<li><a href="#附录二：豆腐巷新事">附录二：豆腐巷新事</a></li>
-<li><a href="#跋：方无咎死后">跋：方无咎死后</a></li>
-<li><a href="#听雪剑门编年">听雪剑门编年</a></li>
-<li><a href="#听雪剑门第十九代掌门语录">听雪剑门第十九代掌门语录</a></li>
-<li><a href="#一段未完成的话">一段未完成的话</a></li>
-<li><a href="#后跋">后跋</a></li>
-<li><a href="#山海错·卷三：雪山外传">山海错·卷三：雪山外传</a></li>
-<li><a href="#终跋·写在最后">终跋·写在最后</a></li>
-</ul></div>
 <hr/>
-<h2 id="第一章-山上的人">第一章 山上的人</h2>
-<p>我是被师父从山下捡回来的。</p>
-<p>这说法是我师父说的版本。另一个版本是我师父说的另一个版本，他说我是从天上掉下来的。听起来后者比较有来头，但前者听起来比较现实。我师父是个现实的人，他选择相信前者。</p>
-<p>我八岁那年，师父下山去买米，看见路边一个小孩在啃树皮。他本来不想管的，他说他不是菩萨，他说他一个练剑的人看见路边有人啃树皮，多一事不如少一事。但他走了两步又回来了，因为他发现那个小孩啃树皮啃得很有章法，每一根树皮都是顺着一个方向啃的，啃出来的木屑飘落在地上，整整齐齐一排，像是用剑削出来的。</p>
-<p>他当时很惊讶。他说他练剑二十多年，下山行走江湖几十年，没见过一个小孩子把嚼碎木屑也能吐得这么齐整。</p>
-<p>他蹲下来问我：小孩，你饿吗。</p>
-<p>我说饿。</p>
-<p>他问：你爹妈呢。</p>
-<p>我说不知道。</p>
-<p>他问：你叫什么名字。</p>
-<p>我说方无咎。</p>
-<p>他愣了一下，站起来就走。走了几步又回头说：你跟我走吧。</p>
-<p>我放下树皮，问他：你管饭吗。</p>
-<p>他说管。</p>
-<p>我说：那行。</p>
-<p>就这样，我上了听雪山。</p>
-<p>后来他告诉我，他蹲下来问我名字的时候，我报出&quot;方无咎&quot;三个字，他以为我爹是读书人，并且死前给我把这三个字教了很多遍。读书人家的小孩，父母双亡，下落不明，吃树皮吃得跟练剑一样——这种配置，在当时的江湖上大概率只有一个出处：某个刚被灭了门的门派里流落出来的小孩。</p>
-<p>他去查过。查了三个月，没查到任何一个叫得出名字的门派在那两年被灭过门。</p>
-<p>他说，那也行，那就不查了，反正山上缺一个扫地的。</p>
-<p>这就是我师父。一个大智若愚的人，或者说，就是一个挺倒霉的人。</p>
-<p>我师父叫陆青莲。</p>
-<p>听起来像个女人，但他当时说这是按辈分取的，他上上一辈有个师祖叫陆青骢，传说是个白马银枪的少年将军，后来因为失恋躲到山上来给老观主烧火，烧了三十年，火烧得世上最好，但是再也没有下过山。我师父师祖当年给他取名的时候，本来想叫陆青马，但是字太难看，就改成了陆青莲。我师父觉得自己爹死得早没给他取名，硬生生给改了回来，他觉得陆青莲比陆青马好听一辈子，他说青马还不如叫青驴，后来他就叫陆青莲。</p>
-<p>陆青莲，听着像女子，但我师父是个大男人，胡子拉碴的那种。他剑术不算高，但是江湖上公认他人缘好。所谓人缘好就是他下山谁都能跟他喝两盅，喝完都愿意赊他账。我小时候特崇拜这个本事。后来我下山才发现，所谓人缘好就是别人不愿意跟他动剑，因为跟他动剑的人也赊他账，赊完又不好意思要回来，不如不跟他打。</p>
-<p>我师父一辈子总结下来就是一句话：武功不高，喝酒第一。</p>
-<p>但我师父师父的师父，是个真高手。</p>
-<p>这位高人叫做陆承清，是我们听雪剑门的第十七代掌门。十六岁下山，三十岁回山，七十岁死。中间五十四年都在江湖上漂着，等他回来的时候，山上道观都快倒了。他花了二十多年修屋顶，修得我们这片山中屋顶最结实的就是他家。最厉害的一次是有一年发山洪，山下的庙都塌了，山上的就他家没塌。山下的和尚来找他借地方住，他说你住吧，反正多一个不多，多两个我也有地方睡。</p>
-<p>他这种人就是传说中的大侠。武侠故事里写的那些大侠就是他这种人——武艺高强，性格孤僻，不苟言笑，走到哪里都不给面子。我师父说，他当年回山来的时候，身上穿的衣裳都是补了又补的，吃的饭都是稀得能照见人影的粥，但是剑养得雪亮。剑刃雪亮到他晚上把剑放在床头，半个屋子都亮堂堂。我们山上那时候还没油灯，就靠这把剑照了一个月的明。</p>
-<p>这位老掌门的武功之高，我至今没见过有人能形容出来。我师父形容过一次，说他左手能把一壶热酒隔空搬到右手上，再隔空放到桌上，桌上的人毫发无伤。听起来跟庙里的罗汉一样，但其实他左手右手他都没动，纯粹用剑鞘当钩子，把酒壶勾过去。</p>
-<p>&quot;但是，&quot;我师父说，&quot;他眼神不好。&quot;</p>
-<p>我说：&quot;眼神不好是什么意思？&quot;</p>
-<p>我师父说：&quot;就是说，他到了五十岁那年，看见我也叫师兄。&quot;</p>
-<p>这是我师父和我师祖之间的关系 — 师祖眼神不好，总是以为我师父是他早夭的师兄转世。每次我师父纠正他，他都说&quot;你就是，记得别再投畜生道了&quot;。我师父纠正了二十年，到后来也懒得纠正。</p>
-<p>陆承清是上一辈人心中真正的神。</p>
-<p>而我要讲的不是他。</p>
-<p>我要讲的是后来。</p>
+<h2 class="chapter-h" data-chapter="1" id="第一章-山上的人">第一章 山上的人</h2>
+<p data-t="0.0" data-i="0">我是被师父从山下捡回来的。</p>
+<p data-t="2.8" data-i="1">这说法是我师父说的版本。另一个版本是我师父说的另一个版本，他说我是从天上掉下来的。听起来后者比较有来头，但前者听起来比较现实。我师父是个现实的人，他选择相信前者。</p>
+<p data-t="19.7" data-i="2">我八岁那年，师父下山去买米，看见路边一个小孩在啃树皮。他本来不想管的，他说他不是菩萨，他说他一个练剑的人看见路边有人啃树皮，多一事不如少一事。但他走了两步又回来了，因为他发现那个小孩啃树皮啃得很有章法，每一根树皮都是顺着一个方向啃的，啃出来的木屑飘落在地上，整整齐齐一排，像是用剑削出来的。</p>
+<p data-t="53.8" data-i="4">他当时很惊讶。他说他练剑二十多年，下山行走江湖几十年，没见过一个小孩子把嚼碎木屑也能吐得这么齐整。</p>
+<p data-t="64.7" data-i="5">他蹲下来问我：小孩，你饿吗。</p>
+<p data-t="68.9" data-i="6">我说饿。</p>
+<p data-t="69.9" data-i="7">他问：你爹妈呢。</p>
+<p data-t="72.3" data-i="8">我说不知道。</p>
+<p data-t="73.8" data-i="9">他问：你叫什么名字。</p>
+<p data-t="76.3" data-i="10">我说方无咎。</p>
+<p data-t="77.7" data-i="11">他愣了一下，站起来就走。走了几步又回头说：你跟我走吧。</p>
+<p data-t="84.7" data-i="12">我放下树皮，问他：你管饭吗。</p>
+<p data-t="88.3" data-i="13">他说管。</p>
+<p data-t="89.2" data-i="14">我说：那行。</p>
+<p data-t="91.0" data-i="15">就这样，我上了听雪山。</p>
+<p data-t="93.5" data-i="16">后来他告诉我，他蹲下来问我名字的时候，我报出&quot;方无咎&quot;三个字，他以为我爹是读书人，并且死前给我把这三个字教了很多遍。读书人家的小孩，父母双亡，下落不明，吃树皮吃得跟练剑一样——这种配置，在当时的江湖上大概率只有一个出处：某个刚被灭了门的门派里流落出来的小孩。</p>
+<p data-t="122.6" data-i="18">他去查过。查了三个月，没查到任何一个叫得出名字的门派在那两年被灭过门。</p>
+<p data-t="130.5" data-i="19">他说，那也行，那就不查了，反正山上缺一个扫地的。</p>
+<p data-t="137.6" data-i="20">这就是我师父。一个大智若愚的人，或者说，就是一个挺倒霉的人。</p>
+<p data-t="144.3" data-i="21">我师父叫陆青莲。</p>
+<p data-t="146.1" data-i="22">听起来像个女人，但他当时说这是按辈分取的，他上上一辈有个师祖叫陆青骢，传说是个白马银枪的少年将军，后来因为失恋躲到山上来给老观主烧火，烧了三十年，火烧得世上最好，但是再也没有下过山。我师父师祖当年给他取名的时候，本来想叫陆青马，但是字太难看，就改成了陆青莲。我师父觉得自己爹死得早没给他取名，硬生生给改了回来，他觉得陆青莲比陆青马好听一辈子，他说青马还不如叫青驴，后来他就叫陆青莲。</p>
+<p data-t="188.0" data-i="26">陆青莲，听着像女子，但我师父是个大男人，胡子拉碴的那种。他剑术不算高，但是江湖上公认他人缘好。所谓人缘好就是他下山谁都能跟他喝两盅，喝完都愿意赊他账。我小时候特崇拜这个本事。后来我下山才发现，所谓人缘好就是别人不愿意跟他动剑，因为跟他动剑的人也赊他账，赊完又不好意思要回来，不如不跟他打。</p>
+<p data-t="222.4" data-i="29">我师父一辈子总结下来就是一句话：武功不高，喝酒第一。</p>
+<p data-t="228.1" data-i="30">但我师父师父的师父，是个真高手。</p>
+<p data-t="231.7" data-i="31">这位高人叫做陆承清，是我们听雪剑门的第十七代掌门。十六岁下山，三十岁回山，七十岁死。中间五十四年都在江湖上漂着，等他回来的时候，山上道观都快倒了。他花了二十多年修屋顶，修得我们这片山中屋顶最结实的就是他家。最厉害的一次是有一年发山洪，山下的庙都塌了，山上的就他家没塌。山下的和尚来找他借地方住，他说你住吧，反正多一个不多，多两个我也有地方睡。</p>
+<p data-t="273.1" data-i="35">他这种人就是传说中的大侠。武侠故事里写的那些大侠就是他这种人——武艺高强，性格孤僻，不苟言笑，走到哪里都不给面子。我师父说，他当年回山来的时候，身上穿的衣裳都是补了又补的，吃的饭都是稀得能照见人影的粥，但是剑养得雪亮。剑刃雪亮到他晚上把剑放在床头，半个屋子都亮堂堂。我们山上那时候还没油灯，就靠这把剑照了一个月的明。</p>
+<p data-t="311.2" data-i="39">这位老掌门的武功之高，我至今没见过有人能形容出来。我师父形容过一次，说他左手能把一壶热酒隔空搬到右手上，再隔空放到桌上，桌上的人毫发无伤。听起来跟庙里的罗汉一样，但其实他左手右手他都没动，纯粹用剑鞘当钩子，把酒壶勾过去。</p>
+<p data-t="337.9" data-i="41">&quot;但是，&quot;我师父说，&quot;他眼神不好。&quot;</p>
+<p data-t="342.3" data-i="42">我说：&quot;眼神不好是什么意思？&quot;</p>
+<p data-t="345.9" data-i="43">我师父说：&quot;就是说，他到了五十岁那年，看见我也叫师兄。&quot;</p>
+<p data-t="352.0" data-i="44">这是我师父和我师祖之间的关系 — 师祖眼神不好，总是以为我师父是他早夭的师兄转世。每次我师父纠正他，他都说&quot;你就是，记得别再投畜生道了&quot;。我师父纠正了二十年，到后来也懒得纠正。</p>
+<p data-t="373.2" data-i="46">陆承清是上一辈人心中真正的神。</p>
+<p data-t="376.4" data-i="47">而我要讲的不是他。</p>
+<p data-t="378.8" data-i="48">我要讲的是后来。</p>
 <hr/>
-<p>听雪山上很安静。</p>
-<p>这种安静不是那种风景区里的安静。风景区里的安静是舒服的。或者说，风景区是给那些&quot;觉得安静很舒服&quot;的人准备的。山上的安静不是。山上的安静是一种，真的什么都没有的安静。</p>
-<p>早上起来，走出门，看见云，云就在你脚下。看见树，树就在你肩膀上。看见一只鸟，那鸟看见你之后，不飞，它盯着你。它比你还镇定。</p>
-<p>这就是听雪山的早晨。</p>
-<p>我八岁那年刚来的时候，觉得这地方好玩得不得了。没爹没娘的孩子最知道什么叫自由。自由就是你不需要跟任何人交代。我在下山之前吃树皮的时候是这样，在山上吃饱了以后也是这样。所以我一上山就觉得我到了天堂。</p>
-<p>我师父不知道是看出了我这个心态还是怎么，他说了一段话。他说：</p>
-<p>&quot;无咎，你要知道，山上什么都好，就是不好玩。不好玩的意思是，你一开始可能觉得好玩，但是十年二十年你会觉得不好玩。那个时候你再想下山是来不及的。练剑这件事是这样的，要么你别练，要么你就要练一辈子。半途下山的人江湖上不认你，山上也不认你。你就是个没人要的。&quot;</p>
-<p>我当时点头如捣蒜，也不知道他在说什么。</p>
-<p>但后来我懂了。</p>
-<p>练剑这件事，在山上练，是一件事。下山练，是另一件事。山上的剑是用来给自己的，下山的剑是用来给别人的。山上的剑可以练到八十岁没有人看见，下山的剑练到八十岁没有人陪你下棋。</p>
-<p>而听雪山上最缺的就是陪人下棋的。</p>
-<p>我师父在我八岁那年把我捡回来，按理说我是他第十七代弟子里的哪一个。其实我也不知道，我师父也不给我说，他说我也是按辈分给取了的，无咎两个字正好是某一代的字辈里排着的。他没说是什么字辈，他说不重要，重要的是你往后就这么叫，反正在山上，没人问你这些。</p>
-<p>我师父一辈子糊涂。就这么两个人，能弄清楚就要弄清楚，弄不清楚的就算了。</p>
-<p>听雪山上除了我师父和我，还有几个人。</p>
-<p>第一个是我大师兄，叫周止。这个名字听起来像个有道高僧，但实际上他一辈子最大的愿望是还俗。周止其实已经还俗过两次，第一次还俗跑下山去做生意，做了三个月赔了十几个铜板，又回来了。第二次还俗去找一个他曾经在庙会上认识的女子，结果那个女子已经嫁给了城里的一个秀才。他下山那天，山上的积雪有两尺厚，他一脚踩空滑到了山脚底下，等他绕回来脸上已经全是泥了。我师父当时看他一眼说：你这是摔着走的吧。周止说师父我没摔着我也没走着，我是滑着回来的，我师父说我问的是你脸上的表情。</p>
-<p>周止后来给我说过，他这辈子最满意的不是剑，是他那块玉佩。那块玉佩是他娘临死前给他缝在腰上的，他一直藏着，藏到十年后才拿出来看。我问他玉佩上刻的什么，他说刻的是他娘的牙。我当时没听懂，后来才明白，是他娘临死前咬过他一口，咬在指头上没咬破，把那块玉佩上的齿痕当成了他娘的&quot;刻&quot;。</p>
-<p>周止一辈子没学好剑，主要原因是他太好说话了。剑客应该是那种冷面冷心的人，再不济也得是冷面热心。但周止是热面热心，剑没练好就先把毛病都让别人看见了。他有什么好东西都要拿出来分，分到最后自己没东西，自己也不着急。这是一种很糟糕的性格。</p>
-<p>第二个是我二师姐，叫陆小忍。这个&quot;陆&quot;是她自己的姓，她是陆家收养的孩子，所以她姓陆。小忍是她师父给取的，因为她师父说她&quot;小不忍则乱大谋&quot;。其实她师父是想说她动不动就要跟人打架，不管对方武功高低她都要打，打得过就打，打不过也要打。她师父给她取名小忍，希望她能忍。但她忍了十七年也没忍出什么来。</p>
-<p>小忍师姐剑法是山上最好的，剑法最好不是说她在江湖上能排第几，山上就这几个人，她排第几不重要。她剑法好是因为她好像天生就跟剑熟悉。我师父说过，江湖上有两种剑客，一种是把剑当成手臂的延伸，一种是剑就是剑，她就是第二种。她说，剑就是剑。我有的时候觉得你跟它没关系它才跟你有关系。你越把它当成自己的，它越不听话。</p>
-<p>小忍师姐最厉害的不是剑法，是脾气。脾气跟她的名字其实是反着的。她叫小忍，但是谁都不敢惹她。山上的师兄都知道，如果你跟小忍师姐吵架，吵赢了她会让你输，吵输了你更会输。有一次大师兄周止不小心把她的洗脚水倒了，她追着周止从山腰打到山脚，最后周止把自己的洗脚水也倒了她才消停。</p>
-<p>但是小忍师姐对我不一样。她从来不跟我吵。我八岁那年上山，个子还不到她腰，她那时候十二岁，每天就负责教我认字。她认字比我多，所以她教我认字的时候很有耐心的样子。但是这个&quot;有耐心的样子&quot;很短暂，等我到了十二岁她认字认不过我的时候，她就开始用剑跟我说话了。</p>
+<p data-t="380.6" data-i="49">听雪山上很安静。</p>
+<p data-t="382.4" data-i="50">这种安静不是那种风景区里的安静。风景区里的安静是舒服的。或者说，风景区是给那些&quot;觉得安静很舒服&quot;的人准备的。山上的安静不是。山上的安静是一种，真的什么都没有的安静。</p>
+<p data-t="401.5" data-i="52">早上起来，走出门，看见云，云就在你脚下。看见树，树就在你肩膀上。看见一只鸟，那鸟看见你之后，不飞，它盯着你。它比你还镇定。</p>
+<p data-t="418.1" data-i="53">这就是听雪山的早晨。</p>
+<p data-t="420.2" data-i="54">我八岁那年刚来的时候，觉得这地方好玩得不得了。没爹没娘的孩子最知道什么叫自由。自由就是你不需要跟任何人交代。我在下山之前吃树皮的时候是这样，在山上吃饱了以后也是这样。所以我一上山就觉得我到了天堂。</p>
+<p data-t="442.2" data-i="57">我师父不知道是看出了我这个心态还是怎么，他说了一段话。他说：</p>
+<p data-t="447.9" data-i="58">&quot;无咎，你要知道，山上什么都好，就是不好玩。不好玩的意思是，你一开始可能觉得好玩，但是十年二十年你会觉得不好玩。那个时候你再想下山是来不及的。练剑这件事是这样的，要么你别练，要么你就要练一辈子。半途下山的人江湖上不认你，山上也不认你。你就是个没人要的。&quot;</p>
+<p data-t="476.7" data-i="60">我当时点头如捣蒜，也不知道他在说什么。</p>
+<p data-t="480.9" data-i="61">但后来我懂了。</p>
+<p data-t="482.3" data-i="62">练剑这件事，在山上练，是一件事。下山练，是另一件事。山上的剑是用来给自己的，下山的剑是用来给别人的。山上的剑可以练到八十岁没有人看见，下山的剑练到八十岁没有人陪你下棋。</p>
+<p data-t="503.0" data-i="64">而听雪山上最缺的就是陪人下棋的。</p>
+<p data-t="506.6" data-i="65">我师父在我八岁那年把我捡回来，按理说我是他第十七代弟子里的哪一个。其实我也不知道，我师父也不给我说，他说我也是按辈分给取了的，无咎两个字正好是某一代的字辈里排着的。他没说是什么字辈，他说不重要，重要的是你往后就这么叫，反正在山上，没人问你这些。</p>
+<p data-t="533.7" data-i="67">我师父一辈子糊涂。就这么两个人，能弄清楚就要弄清楚，弄不清楚的就算了。</p>
+<p data-t="540.5" data-i="68">听雪山上除了我师父和我，还有几个人。</p>
+<p data-t="544.7" data-i="69">第一个是我大师兄，叫周止。这个名字听起来像个有道高僧，但实际上他一辈子最大的愿望是还俗。周止其实已经还俗过两次，第一次还俗跑下山去做生意，做了三个月赔了十几个铜板，又回来了。第二次还俗去找一个他曾经在庙会上认识的女子，结果那个女子已经嫁给了城里的一个秀才。他下山那天，山上的积雪有两尺厚，他一脚踩空滑到了山脚底下，等他绕回来脸上已经全是泥了。我师父当时看他一眼说：你这是摔着走的吧。周止说师父我没摔着我也没走着，我是滑着回来的，我师父说我问的是你脸上的表情。</p>
+<p data-t="599.8" data-i="74">周止后来给我说过，他这辈子最满意的不是剑，是他那块玉佩。那块玉佩是他娘临死前给他缝在腰上的，他一直藏着，藏到十年后才拿出来看。我问他玉佩上刻的什么，他说刻的是他娘的牙。我当时没听懂，后来才明白，是他娘临死前咬过他一口，咬在指头上没咬破，把那块玉佩上的齿痕当成了他娘的&quot;刻&quot;。</p>
+<p data-t="633.5" data-i="77">周止一辈子没学好剑，主要原因是他太好说话了。剑客应该是那种冷面冷心的人，再不济也得是冷面热心。但周止是热面热心，剑没练好就先把毛病都让别人看见了。他有什么好东西都要拿出来分，分到最后自己没东西，自己也不着急。这是一种很糟糕的性格。</p>
+<p data-t="663.0" data-i="79">第二个是我二师姐，叫陆小忍。这个&quot;陆&quot;是她自己的姓，她是陆家收养的孩子，所以她姓陆。小忍是她师父给取的，因为她师父说她&quot;小不忍则乱大谋&quot;。其实她师父是想说她动不动就要跟人打架，不管对方武功高低她都要打，打得过就打，打不过也要打。她师父给她取名小忍，希望她能忍。但她忍了十七年也没忍出什么来。</p>
+<p data-t="699.7" data-i="82">小忍师姐剑法是山上最好的，剑法最好不是说她在江湖上能排第几，山上就这几个人，她排第几不重要。她剑法好是因为她好像天生就跟剑熟悉。我师父说过，江湖上有两种剑客，一种是把剑当成手臂的延伸，一种是剑就是剑，她就是第二种。她说，剑就是剑。我有的时候觉得你跟它没关系它才跟你有关系。你越把它当成自己的，它越不听话。</p>
+<p data-t="736.4" data-i="85">小忍师姐最厉害的不是剑法，是脾气。脾气跟她的名字其实是反着的。她叫小忍，但是谁都不敢惹她。山上的师兄都知道，如果你跟小忍师姐吵架，吵赢了她会让你输，吵输了你更会输。有一次大师兄周止不小心把她的洗脚水倒了，她追着周止从山腰打到山脚，最后周止把自己的洗脚水也倒了她才消停。</p>
+<p data-t="765.9" data-i="88">但是小忍师姐对我不一样。她从来不跟我吵。我八岁那年上山，个子还不到她腰，她那时候十二岁，每天就负责教我认字。她认字比我多，所以她教我认字的时候很有耐心的样子。但是这个&quot;有耐心的样子&quot;很短暂，等我到了十二岁她认字认不过我的时候，她就开始用剑跟我说话了。</p>
 <p>用剑说话是我师父的意思——山上同门之间，用木剑过招。</p>
-<p>我十二岁那年第一次拿木剑跟小忍师姐过招，结果一招没过，我被她用木剑柄敲了一下脑袋。</p>
-<p>她说：&quot;你以后要是再用这种剑法跟人比武，人家会以为你是来搞笑的。&quot;</p>
-<p>我承认我剑法不行。</p>
-<p>但我承认我师父剑法也不行。</p>
-<p>听雪山上，准确的来说，剑法最厉害的人不是陆青莲，也不是陆小忍，也不是周止，是师祖陆承清。但陆承清那时候已经不下山了，也不跟徒弟们过招。他每天就在山上最高的那块石头上坐着。坐着看远处，远处什么都没有。</p>
-<p>我师父有一次被师祖叫过去，师祖跟他说了一段话：&quot;你们这群孩子练剑，练得再多也是江湖中下等的水平。&quot;</p>
-<p>我师父说：&quot;是。&quot;</p>
-<p>师祖说：&quot;但是你们也有你们的用处。&quot;</p>
-<p>我师父问：&quot;什么用处？&quot;</p>
-<p>师祖说：&quot;看门。&quot;</p>
-<p>我师父沉默了一会。</p>
-<p>师祖说：&quot;你这辈子最大的用处，就是看门。但是不丢人了，你看门看得好的话，比有的人杀人杀得好还要功夫深。&quot;</p>
-<p>我师父那时候才三十多岁。他说听了这话他哭了三天。</p>
-<p>他后来跟我说，那个师祖不会说话，说完这话他下山云游去了，三个月才回来，回来的时候一脸没事人一样，而我师父还红着眼。</p>
-<p>这就是听雪山的师祖。一个让别人哭三天自己也忘了的人。</p>
-<p>听雪山上，还有一位师祖辈的人物，就是之前说的常年卧病在床的那位。这位叫陆茂山，是陆承清的师弟。陆茂山比陆承清小十几岁，但是没下山过。他一辈子就住在道观后院的小屋里，屋门口常年放着一把藤椅，藤椅上常年躺着一个人，那个人的脸上常年盖着一本书。</p>
-<p>他的武功谁也没见过。我师父说他武功很高，甚至比陆承清还高。我问为什么不见他出手，我师父说他早就不出手了。</p>
-<p>我那时候小，听不懂这话，觉得一个这么厉害的人怎么就不出手。长大了才明白，江湖上的高手不是不打架，而是没什么值得打的。</p>
-<p>陆茂山师叔祖每天喜欢给我讲故事。他讲故事讲得最多的是江湖上的故事。他说他以前在江湖上的名号叫&quot;清夜一剑&quot;，意思是只要对手能在天黑之前找到他，他就在夜里出剑。我问那找到了呢，他说找到了他也不出剑，因为他那时候已经不在江湖了。我说你都不在江湖了别人找你干什么，他说找你的人大部分都不知道你不在江湖。</p>
-<p>我八岁那年就是听不懂这话的。</p>
+<p data-t="796.7" data-i="91">我十二岁那年第一次拿木剑跟小忍师姐过招，结果一招没过，我被她用木剑柄敲了一下脑袋。</p>
+<p data-t="804.6" data-i="92">她说：&quot;你以后要是再用这种剑法跟人比武，人家会以为你是来搞笑的。&quot;</p>
+<p data-t="812.6" data-i="93">我承认我剑法不行。</p>
+<p data-t="814.7" data-i="94">但我承认我师父剑法也不行。</p>
+<p data-t="817.5" data-i="95">听雪山上，准确的来说，剑法最厉害的人不是陆青莲，也不是陆小忍，也不是周止，是师祖陆承清。但陆承清那时候已经不下山了，也不跟徒弟们过招。他每天就在山上最高的那块石头上坐着。坐着看远处，远处什么都没有。</p>
+<p data-t="841.4" data-i="98">我师父有一次被师祖叫过去，师祖跟他说了一段话：&quot;你们这群孩子练剑，练得再多也是江湖中下等的水平。&quot;</p>
+<p data-t="851.8" data-i="99">我师父说：&quot;是。&quot;</p>
+<p data-t="853.8" data-i="100">师祖说：&quot;但是你们也有你们的用处。&quot;</p>
+<p data-t="858.0" data-i="101">我师父问：&quot;什么用处？&quot;</p>
+<p data-t="860.8" data-i="102">师祖说：&quot;看门。&quot;</p>
+<p data-t="863.2" data-i="103">我师父沉默了一会。</p>
+<p data-t="865.2" data-i="104">师祖说：&quot;你这辈子最大的用处，就是看门。但是不丢人了，你看门看得好的话，比有的人杀人杀得好还要功夫深。&quot;</p>
+<p data-t="877.4" data-i="105">我师父那时候才三十多岁。他说听了这话他哭了三天。</p>
+<p data-t="883.4" data-i="106">他后来跟我说，那个师祖不会说话，说完这话他下山云游去了，三个月才回来，回来的时候一脸没事人一样，而我师父还红着眼。</p>
+<p data-t="896.5" data-i="107">这就是听雪山的师祖。一个让别人哭三天自己也忘了的人。</p>
+<p data-t="902.1" data-i="108">听雪山上，还有一位师祖辈的人物，就是之前说的常年卧病在床的那位。这位叫陆茂山，是陆承清的师弟。陆茂山比陆承清小十几岁，但是没下山过。他一辈子就住在道观后院的小屋里，屋门口常年放着一把藤椅，藤椅上常年躺着一个人，那个人的脸上常年盖着一本书。</p>
+<p data-t="931.3" data-i="110">他的武功谁也没见过。我师父说他武功很高，甚至比陆承清还高。我问为什么不见他出手，我师父说他早就不出手了。</p>
+<p data-t="944.9" data-i="111">我那时候小，听不懂这话，觉得一个这么厉害的人怎么就不出手。长大了才明白，江湖上的高手不是不打架，而是没什么值得打的。</p>
+<p data-t="958.1" data-i="112">陆茂山师叔祖每天喜欢给我讲故事。他讲故事讲得最多的是江湖上的故事。他说他以前在江湖上的名号叫&quot;清夜一剑&quot;，意思是只要对手能在天黑之前找到他，他就在夜里出剑。我问那找到了呢，他说找到了他也不出剑，因为他那时候已经不在江湖了。我说你都不在江湖了别人找你干什么，他说找你的人大部分都不知道你不在江湖。</p>
+<p data-t="991.5" data-i="114">我八岁那年就是听不懂这话的。</p>
 <p>但是我喜欢听故事。我尤其喜欢听他说，听说当年江湖上有个人物叫&quot;九指神魔&quot;，这位神魔只有九个手指，因为少了一根，是他自己砍的，原因是他觉得十根手指练剑太多余。</p>
-<p>我还听说江湖上有个人物叫&quot;醉里长歌&quot;，这位老兄喝酒喝到兴起就要拿剑在酒馆里舞剑，结果舞着舞着就把酒馆老板给砍了，从此江湖上不许他进任何一家酒馆。</p>
-<p>这些都是十八路野狐禅，不上台面。但是陆茂山师叔祖讲得绘声绘色，像是他在现场一样。</p>
-<p>后来我才知道，他这些故事大部分确实是他&quot;在&quot;现场的。</p>
-<p>只是他不在江湖上了，江湖也忘了他。</p>
+<p data-t="1014.1" data-i="117">我还听说江湖上有个人物叫&quot;醉里长歌&quot;，这位老兄喝酒喝到兴起就要拿剑在酒馆里舞剑，结果舞着舞着就把酒馆老板给砍了，从此江湖上不许他进任何一家酒馆。</p>
+<p data-t="1029.7" data-i="118">这些都是十八路野狐禅，不上台面。但是陆茂山师叔祖讲得绘声绘色，像是他在现场一样。</p>
+<p data-t="1038.4" data-i="119">后来我才知道，他这些故事大部分确实是他&quot;在&quot;现场的。</p>
+<p data-t="1044.1" data-i="120">只是他不在江湖上了，江湖也忘了他。</p>
 <hr/>
-<h2 id="第二章-下山">第二章 下山</h2>
+<h2 class="chapter-h" data-chapter="2" id="第二章-下山">第二章 下山</h2>
 <p>我在山上待了十年。</p>
 <p>十年的时间，从八岁到十八岁。这十年里我学会了一件事：怎么在山上活下去。另一件事：怎么学会剑。第三件事：怎么让自己不像个剑客。</p>
 <p>第三件事我学得最好。</p>
@@ -483,7 +791,7 @@ body.dark .audio-player {
 <p>我现在也没完全听懂。</p>
 <p>我那时候的懵懂程度，就像我八岁那年刚上山的时候一样。</p>
 <hr/>
-<h2 id="第三章-山海图">第三章 山海图</h2>
+<h2 class="chapter-h" data-chapter="3" id="第三章-山海图">第三章 山海图</h2>
 <p>我十八岁那年冬天，&quot;山海图&quot;这三个字第一次进了我的耳朵。</p>
 <p>当时我们山上来了一个不速之客。</p>
 <p>那是一个穿黑衣的中年人。中年人不高，很瘦，眼睛细长。他牵着两匹马，自己一匹，骑来的一匹。马不是好马，但是马很稳。我师父说会骑马的人才会挑不稳的马，能把不稳的马骑得很稳，比骑好马的人难。</p>
@@ -554,7 +862,7 @@ body.dark .audio-player {
 <p>山上的人会下山，山下的人会上山。</p>
 <p>没有谁天生属于哪里。</p>
 <hr/>
-<h2 id="第四章-山下">第四章 山下</h2>
+<h2 class="chapter-h" data-chapter="4" id="第四章-山下">第四章 山下</h2>
 <p>我下山那天，正好赶上一件大事。</p>
 <p>镇上的县令贴了一张告示，告示上说，山上最近有匪，名字叫&quot;听雪剑门&quot;，是要被剿的。告示的纸张不错，但是字很丑。看起来像是某个新上任的县令亲自写的。</p>
 <p>我看完告示，愣了一下。</p>
@@ -643,7 +951,7 @@ body.dark .audio-player {
 <p>雪落地上的声音，&quot;沙沙&quot;的。</p>
 <p>听雪剑门，真的在听雪。</p>
 <hr/>
-<h2 id="第五章-云台">第五章 云台</h2>
+<h2 class="chapter-h" data-chapter="5" id="第五章-云台">第五章 云台</h2>
 <p>天没亮我们就下山了。</p>
 <p>我背着包袱，里面有两件换洗的衣服，一把木剑，半袋干粮，师父给我的一小袋碎银子。</p>
 <p>小忍师姐背着一个更大的包袱，包袱看上去比她还重。她走路的时候包袱晃荡。我问她里面装的什么，她说：&quot;干粮、铁锅、一袋青菜、半袋米、还有那本师父让我们背下来的《听雪剑谱》。&quot;</p>
@@ -808,7 +1116,7 @@ body.dark .audio-player {
 <p>我不知道要做什么。</p>
 <p>我只是想拿起剑。</p>
 <hr/>
-<h2 id="第六章-县衙">第六章 县衙</h2>
+<h2 class="chapter-h" data-chapter="6" id="第六章-县衙">第六章 县衙</h2>
 <p>素娘。</p>
 <p>我心里一直挂着她。</p>
 <p>第二天一早，我和小忍师姐从云台剑派下山。</p>
@@ -1088,7 +1396,7 @@ body.dark .audio-player {
 <p>她转身，走了。</p>
 <p>我那时候看着她走，我忽然意识到，我下山的这段时间，是我一辈子里最长的一段时间。</p>
 <hr/>
-<h2 id="第七章-回山">第七章 回山</h2>
+<h2 class="chapter-h" data-chapter="7" id="第七章-回山">第七章 回山</h2>
 <p>我回山的时候是第三天傍晚。</p>
 <p>雪已经停了，但是满山都是雪。</p>
 <p>我上山的时候，远远看见我师父坐在山门口。</p>
@@ -1217,7 +1525,7 @@ body.dark .audio-player {
 <p>雪落在山门前的声音，是&quot;沙沙&quot;的。</p>
 <p>听雪剑门，听了一辈子雪。</p>
 <hr/>
-<h2 id="第八章-三年后">第八章 三年后</h2>
+<h2 class="chapter-h" data-chapter="8" id="第八章-三年后">第八章 三年后</h2>
 <p>师姐没有回来。</p>
 <p>三年过去了。</p>
 <p>这三年的事情太多了，我说不完。我简单说一说。</p>
@@ -1413,7 +1721,7 @@ body.dark .audio-player {
 <p>他扫的不是雪，是心里的山海图。</p>
 <p>我决定下山。</p>
 <hr/>
-<h2 id="第九章-山下十年">第九章 山下十年</h2>
+<h2 class="chapter-h" data-chapter="9" id="第九章-山下十年">第九章 山下十年</h2>
 <p>我下山那年，是二十五岁。</p>
 <p>这一年朝代已经换过了。</p>
 <p>前朝的皇帝死在了逃亡的路上，新朝的皇帝在北方的一个小镇子上登基。新皇帝登基的时候，整个江湖都乱了。江湖乱了十年。十年里，山上山下都不太平。</p>
@@ -1648,7 +1956,7 @@ body.dark .audio-player {
 <p>山海图&quot;无&quot;。</p>
 <p>山海图在每个人心里。</p>
 <hr/>
-<h2 id="第十章-山海图">第十章 山海图</h2>
+<h2 class="chapter-h" data-chapter="10" id="第十章-山海图">第十章 山海图</h2>
 <p>我回到听雪剑门的时候，山上的雪已经停了。</p>
 <p>师叔祖陆茂山坐在后山的小亭子里。</p>
 <p>他听见我回来了，他抬头看了我一眼。</p>
@@ -1890,7 +2198,7 @@ body.dark .audio-player {
 <p>他说：&quot;去吧。&quot;</p>
 <p>我和小忍师姐下了山。</p>
 <hr/>
-<h2 id="尾声">尾声</h2>
+<h2 class="chapter-h" data-chapter="11" id="尾声">尾声</h2>
 <p>很久以后，有人问我，方无咎，山海图到底是什么？</p>
 <p>我跟他说了我在听雪剑门听到的话。</p>
 <p>我跟他说，山海图是每个人心里的&quot;有&quot;。</p>
@@ -1940,7 +2248,7 @@ body.dark .audio-player {
 <hr/>
 <p><em>（全书完）</em></p>
 <hr/>
-<h2 id="后记">后记</h2>
+<h2 class="chapter-h" data-chapter="12" id="后记">后记</h2>
 <p>很多年以后，山下流传着一本残缺不全的抄本。抄本里讲了一个叫方无咎的人，讲了他从听雪剑门下山的故事。这本残本被一个说书先生在茶馆里说，书名叫《山海错》。</p>
 <p>说书先生每次开讲之前，他都要说一段引子：</p>
 <p>&quot;列位看官，今日且听我讲一段——山上的人下山，山下的人上山，山海图不在山上也不在山下，山海图在心里。&quot;</p>
@@ -1983,7 +2291,7 @@ body.dark .audio-player {
 <p>若看官觉得我这故事有意思，那山海图本来就有意思。</p>
 <p>山海图有没有意思，问您自己。</p>
 <hr/>
-<h2 id="附录：听雪剑门小记">附录：听雪剑门小记</h2>
+<h2 class="chapter-h" data-chapter="13" id="附录：听雪剑门小记">附录：听雪剑门小记</h2>
 <p>小时候我一直不知道，&quot;听雪&quot;这两个字，听起来很好听，写出来也好看，但是山上师兄弟都不喜欢这两个字。</p>
 <p>我问师父为什么不喜欢。</p>
 <p>师父说：&quot;听雪听起来好像很美，但是听雪的人不一定美。一个练剑的人，听的不是雪的声音，是雪压在剑尖上的重量。雪有重量，雪压在剑尖上，剑下沉一分，练剑的人才知道自己的剑有多重。&quot;</p>
@@ -2053,7 +2361,7 @@ body.dark .audio-player {
 <p>他说：&quot;客官，山海图有没有，您心里有数。&quot;</p>
 <p>台下人笑。</p>
 <hr/>
-<h2 id="再附录：听雪剑门人物志">再附录：听雪剑门人物志</h2>
+<h2 class="chapter-h" data-chapter="14" id="再附录：听雪剑门人物志">再附录：听雪剑门人物志</h2>
 <p>一、 师祖陆承清</p>
 <p>江湖人称&quot;剑压南山&quot;。十六岁下山，三十岁回山，七十岁死。一辈子在江湖上五十年，回山后二十年。</p>
 <p>他武功之高，据说左手能把一壶热酒隔空搬到右手上，再隔空放到桌上，桌上的人毫发无伤。</p>
@@ -2096,7 +2404,7 @@ body.dark .audio-player {
 <p>她剑法是山上最好的，剑法好是因为她好像天生就跟剑熟悉。</p>
 <p>她脾气跟她的名字其实是反着的。她叫小忍，但是谁都不敢惹她。</p>
 <p>她从来不跟我吵。我八岁那年上山，十二岁的时候我们过招，一招没过，被她敲了一下脑袋。</p>
-<p>她说：&quot;你以后要是再用这种剑法跟人比武，人家会以为你是来搞笑的。&quot;</p>
+<p data-t="804.6" data-i="92">她说：&quot;你以后要是再用这种剑法跟人比武，人家会以为你是来搞笑的。&quot;</p>
 <p>她后来下山了，三年没回来。她回山那一天，带了一碗不稀的豆腐脑，给我师父的墓前。</p>
 <p>她师父临死前没吃上。她带着她的豆腐脑上山。</p>
 <p>豆腐脑不稀了。</p>
@@ -2157,7 +2465,7 @@ body.dark .audio-player {
 <p>她死的时候，遗憾吗？</p>
 <p>大概吧。</p>
 <hr/>
-<h2 id="八、-公孙大娘他爹——公孙不喝">八、 公孙大娘他爹——公孙不喝</h2>
+<h2 class="chapter-h" data-chapter="15" id="八、-公孙大娘他爹——公孙不喝">八、 公孙大娘他爹——公孙不喝</h2>
 <p>公孙不喝是个做生意的人。一辈子做的最对的一件事情是——没有把山海图当回事。</p>
 <p>他说：&quot;一张破图，它能值多少钱？&quot;</p>
 <p>他做生意赔了以后，他把图送人了。</p>
@@ -2191,7 +2499,7 @@ body.dark .audio-player {
 <p>不是开玩笑。</p>
 <p>它真的烧了。</p>
 <hr/>
-<h2 id="九、-梅也">九、 梅也</h2>
+<h2 class="chapter-h" data-chapter="16" id="九、-梅也">九、 梅也</h2>
 <p>梅也是一个教书先生的儿子。</p>
 <p>他爹一辈子教书，他没教书。</p>
 <p>他一辈子做的最对的一件事情——把那张图烧了。</p>
@@ -2253,7 +2561,7 @@ body.dark .audio-player {
 <p>他说完这句话，他笑了。</p>
 <p>他笑着闭上了眼睛。</p>
 <hr/>
-<h2 id="十、-不图">十、 不图</h2>
+<h2 class="chapter-h" data-chapter="17" id="十、-不图">十、 不图</h2>
 <p>我在豆腐巷卖了十年的豆腐。</p>
 <p>有一天，豆腐巷来了个老人。</p>
 <p>那个老人不是来买豆腐的。</p>
@@ -2351,7 +2659,7 @@ body.dark .audio-player {
 <p>我心里想：所有人，都在哪里？</p>
 <p>我心里想：他们，在，我，心里。</p>
 <hr/>
-<h2 id="附录：本篇之后，还有后续">附录：本篇之后，还有后续</h2>
+<h2 class="chapter-h" data-chapter="18" id="附录：本篇之后，还有后续">附录：本篇之后，还有后续</h2>
 <p>方无咎三十岁那年，他离开了豆腐巷。</p>
 <p>他听说了江湖上新传的一个故事。</p>
 <p>故事是说，山海图没烧。</p>
@@ -2446,7 +2754,7 @@ body.dark .audio-player {
 <hr/>
 <p><em>（续篇完）</em></p>
 <hr/>
-<h2 id="山海错·卷二：天下入山">山海错·卷二：天下入山</h2>
+<h2 class="chapter-h" data-chapter="19" id="山海错·卷二：天下入山">山海错·卷二：天下入山</h2>
 <h3 id="第一章-重逢">第一章 重逢</h3>
 <p>方无咎下山的那年，正好赶上朝廷换了第二个皇帝。</p>
 <p>朝廷换了皇帝这件事，和山上的关系不大。山上的听雪剑门，从开山以来换了不知道多少朝，山上就是山上。朝代是山下的事，山下的人打来打去，山上的雪还是那个雪。</p>
@@ -3520,7 +3828,7 @@ body.dark .audio-player {
 <p>不图的事就是听雪剑门的事。</p>
 <p>这是《山海错》最后一段话。</p>
 <hr/>
-<h2 id="附录：方无咎后传·听雪剑门第二十代">附录：方无咎后传·听雪剑门第二十代</h2>
+<h2 class="chapter-h" data-chapter="20" id="附录：方无咎后传·听雪剑门第二十代">附录：方无咎后传·听雪剑门第二十代</h2>
 <p>孩子上山以后，他学的第一课，是怎么扫雪。</p>
 <p>方无咎教他扫雪。</p>
 <p>&quot;扫雪的时候，&quot;方无咎说，&quot;不要往左边扫，也不要往右边扫。往中间扫。&quot;</p>
@@ -3719,7 +4027,7 @@ body.dark .audio-player {
 <p>方无咎说：&quot;听完了。&quot;</p>
 <p>孩子说：&quot;听完了。&quot;</p>
 <hr/>
-<h2 id="附录：方无咎后传·听雪剑门第二十一代">附录：方无咎后传·听雪剑门第二十一代</h2>
+<h2 class="chapter-h" data-chapter="21" id="附录：方无咎后传·听雪剑门第二十一代">附录：方无咎后传·听雪剑门第二十一代</h2>
 <p>孩子后来也收了一个徒弟。</p>
 <p>他的徒弟上山的时候，他的徒弟问他：&quot;师父，我上山听什么？&quot;</p>
 <p>孩子说：&quot;您上山听循环。&quot;</p>
@@ -3772,7 +4080,7 @@ body.dark .audio-player {
 <p>山下的水听了。</p>
 <p>雪——下——了——</p>
 <hr/>
-<h2 id="附录二：豆腐巷新事">附录二：豆腐巷新事</h2>
+<h2 class="chapter-h" data-chapter="22" id="附录二：豆腐巷新事">附录二：豆腐巷新事</h2>
 <p>很多年以后，豆腐巷重新开张了。</p>
 <p>豆腐巷不叫豆腐巷了，它叫&quot;听雪巷&quot;。</p>
 <p>听雪巷里有一家豆腐坊。豆腐坊的名字叫&quot;稀&quot;。</p>
@@ -3944,7 +4252,7 @@ body.dark .audio-player {
 <p>不图一辈子。</p>
 <p>听雪剑门一辈子。</p>
 <hr/>
-<h2 id="跋：方无咎死后">跋：方无咎死后</h2>
+<h2 class="chapter-h" data-chapter="23" id="跋：方无咎死后">跋：方无咎死后</h2>
 <p>方无咎活了五十三年，死了。</p>
 <p>五十三年里，他下山上山下山下山下山。他上的山是听雪山，他下的山也是听雪山。他一辈子围着同一座山转，转成了第八代之后最不出名的第十九代掌门。</p>
 <p>他死了的那一年，正好赶上雪下得最厚。</p>
@@ -4339,11 +4647,11 @@ body.dark .audio-player {
 <hr/>
 <p><em>（续传完）</em></p>
 <hr/>
-<h2 id="听雪剑门编年">听雪剑门编年</h2>
+<h2 class="chapter-h" data-chapter="24" id="听雪剑门编年">听雪剑门编年</h2>
 <p>方无咎——听雪剑门第十九代掌门，在位五十三年。他将听雪剑门从一间破道观，发展成了一座覆盖方圆百里的松散门派。但是他本人下山三十年，上山二十三年。他在一生中从来没打赢过任何一场比武，但是他说，听雪剑门听雪剑门的，不打。</p>
 <p>他死的那一年正好是某一年某一天的雪下得最大的那一年。他死之前最后一句话，是&quot;我上山了&quot;。</p>
 <hr/>
-<h2 id="听雪剑门第十九代掌门语录">听雪剑门第十九代掌门语录</h2>
+<h2 class="chapter-h" data-chapter="25" id="听雪剑门第十九代掌门语录">听雪剑门第十九代掌门语录</h2>
 <p>方无咎一辈子没说过什么有道理的话。但是他说过的一些话，被他的徒弟们记住了。下面这些话，都是他说的。</p>
 <p>&quot;山下的人不图山上的东西，山上的人不图山下的东西，山海图就不图了。&quot;</p>
 <p>&quot;听雪剑门听的是循环。循环完了不图。不图一辈子。&quot;</p>
@@ -4366,7 +4674,7 @@ body.dark .audio-player {
 <p>&quot;听雪剑门的第一代掌门是陆听雪。第二代是陆闻雪。第三代是陆知雪。第四代是陆见雪。&quot;</p>
 <p>——编年志到这里。</p>
 <hr/>
-<h2 id="关于"我"的一些事">关于&quot;我&quot;的一些事</h2>
+<h2 class="chapter-h" data-chapter="26" id="关于"我"的一些事">关于&quot;我&quot;的一些事</h2>
 <p>很多年后有人问我，写《山海错》的人到底是谁？</p>
 <p>我跟他说了很多事。我跟他说，写《山海错》的人，是方无咎。方无咎是听雪剑门第十九代掌门。方无咎是个老实人。方无咎一辈子上山听雪，下山做豆腐，听&quot;咕嘟咕嘟&quot;的声音，扫雪扫了一辈子，听雪听了一辈子，循环了一辈子。</p>
 <p>方无咎一辈子不图。</p>
@@ -4413,7 +4721,7 @@ body.dark .audio-player {
 <p>我合上书。</p>
 <p>我上山听雪。</p>
 <hr/>
-<h2 id="一段未完成的话">一段未完成的话</h2>
+<h2 class="chapter-h" data-chapter="27" id="一段未完成的话">一段未完成的话</h2>
 <p>方无咎死后的第三年，他的徒弟发现了一本书。</p>
 <p>这本书是方无咎写的。</p>
 <p>这本书叫《山海错》。</p>
@@ -4527,7 +4835,7 @@ body.dark .audio-player {
 <p>他说：&quot;每个人心里都有，山海图。&quot;</p>
 <p>他说：&quot;嗯。&quot;</p>
 <hr/>
-<h2 id="后跋">后跋</h2>
+<h2 class="chapter-h" data-chapter="28" id="后跋">后跋</h2>
 <p>我写完了《山海错》。</p>
 <p>我合上书。</p>
 <p>我上山。</p>
@@ -4556,7 +4864,7 @@ body.dark .audio-player {
 <p>山海错——</p>
 <p>——嗯。</p>
 <hr/>
-<h2 id="山海错·卷三：雪山外传">山海错·卷三：雪山外传</h2>
+<h2 class="chapter-h" data-chapter="29" id="山海错·卷三：雪山外传">山海错·卷三：雪山外传</h2>
 <h3 id="第一章-山外">第一章 山外</h3>
 <p>方无咎死后第十年，山下出了一个人。</p>
 <p>那个人叫梅边吹笛的后人，叫梅也。梅也那时候已经死了。梅也的后人叫梅雪。</p>
@@ -5433,7 +5741,7 @@ body.dark .audio-player {
 <p>《山海错》——</p>
 <p>嗯。</p>
 <hr/>
-<h2 id="终跋·写在最后">终跋·写在最后</h2>
+<h2 class="chapter-h" data-chapter="30" id="终跋·写在最后">终跋·写在最后</h2>
 <p>我写完了《山海错》。</p>
 <p>我合上书。</p>
 <p>我上山。</p>
@@ -5462,70 +5770,317 @@ body.dark .audio-player {
 <p>山海错——</p>
 <p>——嗯。</p>
 <hr/>
-<section class="audio-player">
-  <h3>🎧 听书 · 第一章《山上的人》</h3>
-  <p class="player-meta">约 17 分钟 · 由 MiniMax speech-2.8-hd 朗读 · 老派说书人 audiobook_male_1</p>
-  <audio id="ch1-audio" controls preload="metadata" src="audio/ch1.mp3">
-    你的浏览器不支持 audio 标签。下载：<a href="audio/ch1.mp3">audio/ch1.mp3</a>
-  </audio>
-  <p class="player-tip">
-    💡 提示：可以一边看正文一边听；第一章正文中包含全部内容，从"我是被师父从山下捡回来的"开始。<br>
-    🎬 先听 30 秒预览：<a href="audio/ch1_preview.mp3">audio/ch1_preview.mp3</a>（约 180 KB）
-  </p>
-  <p class="player-tip">
-    <a href="audio/ch1.txt">下载第一章原文</a>
-  </p>
-</section>
-<hr/>
 <p><em>（全书终）</em></p>
-<div class="colophon">
-  《山海错》 · 仿韩寒《长安乱》之作<br>
-  ——— 全书完 ———
+
+    <div class="colophon">
+      《山海错》· 仿韩寒《长安乱》之作<br>
+      <span class="stamp">完</span>
+    </div>
+  </main>
+
+  <aside class="sidebar-right">
+    <section>
+      <h4>🎧 第一章朗读</h4>
+      <p>约 17 分钟 · 老派说书人</p>
+      <a href="audio/ch1.mp3" download>↓ 下载 MP3 (16.5 MB)</a>
+      <a href="audio/ch1_preview.mp3">▶ 30 秒预览</a>
+      <a href="audio/ch1.txt" download>↓ 第一章原文</a>
+    </section>
+    <section>
+      <h4>⌨️ 快捷键</h4>
+      <p><kbd>Space</kbd> 播放/暂停</p>
+      <p><kbd>←</kbd> 后退 5 秒</p>
+      <p><kbd>→</kbd> 前进 5 秒</p>
+      <p>点击段落跳到该处</p>
+    </section>
+    <section>
+      <h4>📜 故事</h4>
+      <p>方无咎，听雪剑门第十九代掌门。一个啃树皮啃得像练剑的八岁孩子，被他师父从山下捡回来，一辈子在下山与上山之间打转。</p>
+    </section>
+  </aside>
+
 </div>
-</article>
+
+<div class="scrim" id="scrim"></div>
+<aside class="drawer" id="drawer" aria-label="章节目录"><h3>目录 · 31 章</h3><ol><li><a href="#序"><span class="toc-num">01</span><span>序</span></a></li>
+<li><a href="#第一章-山上的人"><span class="toc-num">02</span><span>第一章 山上的人</span></a></li>
+<li><a href="#第二章-下山"><span class="toc-num">03</span><span>第二章 下山</span></a></li>
+<li><a href="#第三章-山海图"><span class="toc-num">04</span><span>第三章 山海图</span></a></li>
+<li><a href="#第四章-山下"><span class="toc-num">05</span><span>第四章 山下</span></a></li>
+<li><a href="#第五章-云台"><span class="toc-num">06</span><span>第五章 云台</span></a></li>
+<li><a href="#第六章-县衙"><span class="toc-num">07</span><span>第六章 县衙</span></a></li>
+<li><a href="#第七章-回山"><span class="toc-num">08</span><span>第七章 回山</span></a></li>
+<li><a href="#第八章-三年后"><span class="toc-num">09</span><span>第八章 三年后</span></a></li>
+<li><a href="#第九章-山下十年"><span class="toc-num">10</span><span>第九章 山下十年</span></a></li>
+<li><a href="#第十章-山海图"><span class="toc-num">11</span><span>第十章 山海图</span></a></li>
+<li><a href="#尾声"><span class="toc-num">12</span><span>尾声</span></a></li>
+<li><a href="#后记"><span class="toc-num">13</span><span>后记</span></a></li>
+<li><a href="#附录：听雪剑门小记"><span class="toc-num">14</span><span>附录：听雪剑门小记</span></a></li>
+<li><a href="#再附录：听雪剑门人物志"><span class="toc-num">15</span><span>再附录：听雪剑门人物志</span></a></li>
+<li><a href="#八、-公孙大娘他爹——公孙不喝"><span class="toc-num">16</span><span>八、 公孙大娘他爹——公孙不喝</span></a></li>
+<li><a href="#九、-梅也"><span class="toc-num">17</span><span>九、 梅也</span></a></li>
+<li><a href="#十、-不图"><span class="toc-num">18</span><span>十、 不图</span></a></li>
+<li><a href="#附录：本篇之后，还有后续"><span class="toc-num">19</span><span>附录：本篇之后，还有后续</span></a></li>
+<li><a href="#山海错·卷二：天下入山"><span class="toc-num">20</span><span>山海错·卷二：天下入山</span></a></li>
+<li><a href="#附录：方无咎后传·听雪剑门第二十代"><span class="toc-num">21</span><span>附录：方无咎后传·听雪剑门第二十代</span></a></li>
+<li><a href="#附录：方无咎后传·听雪剑门第二十一代"><span class="toc-num">22</span><span>附录：方无咎后传·听雪剑门第二十一代</span></a></li>
+<li><a href="#附录二：豆腐巷新事"><span class="toc-num">23</span><span>附录二：豆腐巷新事</span></a></li>
+<li><a href="#跋：方无咎死后"><span class="toc-num">24</span><span>跋：方无咎死后</span></a></li>
+<li><a href="#听雪剑门编年"><span class="toc-num">25</span><span>听雪剑门编年</span></a></li>
+<li><a href="#听雪剑门第十九代掌门语录"><span class="toc-num">26</span><span>听雪剑门第十九代掌门语录</span></a></li>
+<li><a href="#关于"><span class="toc-num">27</span><span>关于&quot;我&quot;的一些事</span></a></li>
+<li><a href="#一段未完成的话"><span class="toc-num">28</span><span>一段未完成的话</span></a></li>
+<li><a href="#后跋"><span class="toc-num">29</span><span>后跋</span></a></li>
+<li><a href="#山海错·卷三：雪山外传"><span class="toc-num">30</span><span>山海错·卷三：雪山外传</span></a></li>
+<li><a href="#终跋·写在最后"><span class="toc-num">31</span><span>终跋·写在最后</span></a></li></ol></aside>
+
+<audio id="audio" preload="metadata" src="audio/ch1.mp3"></audio>
+
+<footer class="player" role="region" aria-label="播放器">
+  <button id="back-10" class="player-btn player-mini" aria-label="后退 10 秒">
+    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M11 6l-5 5 5 5V11c3.31 0 6 2.69 6 6s-2.69 6-6 6-6-2.69-6-6H3c0 4.42 3.58 8 8 8s8-3.58 8-8-3.58-8-8-8V6z"/></svg>
+  </button>
+  <button id="play-btn" class="player-btn" aria-label="播放/暂停">
+    <svg id="play-icon" viewBox="0 0 24 24"><path fill="currentColor" d="M8 5v14l11-7z"/></svg>
+  </button>
+  <button id="fwd-10" class="player-btn player-mini" aria-label="前进 10 秒">
+    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M13 6v3c3.31 0 6 2.69 6 6s-2.69 6-6 6-6-2.69-6-6H5c0 4.42 3.58 8 8 8s8-3.58 8-8-3.58-8-8-8V6z"/></svg>
+  </button>
+  <div class="player-info">
+    <div class="player-now">
+      <span class="title">第一章 · 山上的人</span>
+      <span class="timer"><span id="cur-time-b">0:00</span> / <span id="dur-time-b">--:--</span></span>
+    </div>
+    <div class="player-bar">
+      <div class="player-bar-buf" id="bar-buf"></div>
+      <div class="player-bar-fill" id="bar-fill"></div>
+    </div>
+    <div class="player-quote" id="quote">点击播放 · 开始同步朗读</div>
+  </div>
+  <div class="player-extra">
+    <select id="speed" class="speed-select" aria-label="播放速度">
+      <option value="0.8">0.8×</option>
+      <option value="0.9">0.9×</option>
+      <option value="1" selected>1×</option>
+      <option value="1.1">1.1×</option>
+      <option value="1.25">1.25×</option>
+      <option value="1.5">1.5×</option>
+    </select>
+  </div>
+</footer>
+
 <script>
-(function () {
-  // 字号控制
-  var sizes = ['normal', 'large', 'small'];
-  var labels = { normal: '字号', large: '大', small: '小' };
-  var i = 0;
+(function(){
+  'use strict';
 
-  document.getElementById('toggle-size').addEventListener('click', function () {
-    i = (i + 1) % sizes.length;
-    document.body.classList.remove('large', 'small');
-    if (sizes[i] !== 'normal') document.body.classList.add(sizes[i]);
-    this.textContent = '字号 · ' + labels[sizes[i]];
-    try { localStorage.setItem('shanSize', sizes[i]); } catch (e) {}
+  const $ = (id) => document.getElementById(id);
+  const audio       = $('audio');
+  const playBtn     = $('play-btn');
+  const playIcon    = $('play-icon');
+  const backBtn     = $('back-10');
+  const fwdBtn      = $('fwd-10');
+  const barBuf      = $('bar-buf');
+  const barFill     = $('bar-fill');
+  const bar         = document.querySelector('.player-bar');
+  const topFill     = $('top-fill');
+  const topBar      = document.querySelector('.progress-wrap');
+  const cur         = $('cur-time');
+  const curB        = $('cur-time-b');
+  const dur         = $('dur-time');
+  const durB        = $('dur-time-b');
+  const quoteEl     = $('quote');
+  const speedSel    = $('speed');
+  const menuBtn     = $('menu-btn');
+  const drawer      = $('drawer');
+  const scrim       = $('scrim');
+
+  const paras    = Array.from(document.querySelectorAll('main.article p[data-t]'));
+  const sortedT  = paras.map(p => parseFloat(p.dataset.t));
+
+  function fmt(s){
+    if (!isFinite(s) || s < 0) return '0:00';
+    const m = Math.floor(s/60), x = Math.floor(s%60);
+    return m + ':' + String(x).padStart(2,'0');
+  }
+
+  function setPlayingIcon(playing){
+    playIcon.innerHTML = playing
+      ? '<svg viewBox="0 0 24 24"><path fill="currentColor" d="M6 5h4v14H6zM14 5h4v14h-4z"/></svg>'
+      : '<svg viewBox="0 0 24 24"><path fill="currentColor" d="M8 5v14l11-7z"/></svg>';
+  }
+
+  function toggle(){
+    if (audio.paused) audio.play().catch(()=>{});
+    else audio.pause();
+  }
+  playBtn.addEventListener('click', toggle);
+  backBtn.addEventListener('click', () => { audio.currentTime = Math.max(0, audio.currentTime - 10); });
+  fwdBtn .addEventListener('click', () => { audio.currentTime = Math.min((audio.duration||0)+1, audio.currentTime + 10); });
+
+  audio.addEventListener('play',  ()=> setPlayingIcon(true));
+  audio.addEventListener('pause', ()=> setPlayingIcon(false));
+  audio.addEventListener('ended', ()=> { setPlayingIcon(false); clearHighlight(); });
+
+  audio.addEventListener('loadedmetadata', ()=>{
+    const t = fmt(audio.duration);
+    dur.textContent = t;
+    if (durB) durB.textContent = t;
   });
 
-  try {
-    var saved = localStorage.getItem('shanSize');
-    if (saved && saved !== 'normal') {
-      document.body.classList.add(saved);
-      i = sizes.indexOf(saved);
-      document.getElementById('toggle-size').textContent = '字号 · ' + labels[saved];
+  audio.addEventListener('timeupdate', ()=>{
+    const t = audio.currentTime;
+    const d = audio.duration || 0;
+    const pct = d ? (t / d) * 100 : 0;
+    barFill.style.width = pct + '%';
+    topFill.style.width = pct + '%';
+    const f = fmt(t);
+    cur.textContent = f;
+    if (curB) curB.textContent = f;
+    updateHighlight(t);
+  });
+
+  audio.addEventListener('progress', ()=>{
+    if (audio.buffered.length){
+      const end = audio.buffered.end(audio.buffered.length - 1);
+      barBuf.style.width = ((end / (audio.duration||1)) * 100) + '%';
     }
-  } catch (e) {}
-
-  // 主题切换
-  document.getElementById('toggle-theme').addEventListener('click', function () {
-    document.body.classList.toggle('dark');
-    var dark = document.body.classList.contains('dark');
-    this.textContent = dark ? '日间' : '夜间';
-    try { localStorage.setItem('shanDark', dark ? '1' : '0'); } catch (e) {}
   });
 
-  try {
-    if (localStorage.getItem('shanDark') === '1') {
-      document.body.classList.add('dark');
-      document.getElementById('toggle-theme').textContent = '日间';
+  function seekFromEvent(el, ev){
+    const r = el.getBoundingClientRect();
+    const ratio = (ev.clientX - r.left) / r.width;
+    if (audio.duration) audio.currentTime = Math.max(0, Math.min(audio.duration, ratio * audio.duration));
+  }
+  bar.addEventListener('click',    e => seekFromEvent(bar,    e));
+  topBar.addEventListener('click', e => seekFromEvent(topBar, e));
+
+  // ── 跟读高亮 + 引文 + 自动滚动 ──
+  let activeP = null;
+  let lastP = null;
+  let userScrollingTimer = null;
+  let autoFollow = true;
+
+  function clearHighlight(){
+    if (lastP){ lastP.classList.remove('reading','spoken'); lastP = null; }
+    activeP = null;
+    quoteEl.textContent = '';
+  }
+
+  function updateHighlight(t){
+    let lo = 0, hi = sortedT.length - 1, idx = -1;
+    while (lo <= hi){
+      const mid = (lo + hi) >> 1;
+      if (sortedT[mid] <= t){ idx = mid; lo = mid + 1; }
+      else hi = mid - 1;
     }
-  } catch (e) {}
+    if (idx < 0) return;
+    const curP = paras[idx];
+    if (curP === activeP) return;
 
-  // 回到顶部
-  document.getElementById('back-top').addEventListener('click', function () {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    if (lastP){ lastP.classList.remove('reading'); lastP.classList.add('spoken'); }
+    curP.classList.remove('spoken'); curP.classList.add('reading');
+    activeP = curP; lastP = curP;
+
+    const txt = curP.textContent.trim().replace(/\s+/g,' ').slice(0, 90);
+    quoteEl.textContent = txt;
+
+    if (autoFollow && !audio.paused){
+      const r = curP.getBoundingClientRect();
+      if (r.top < 90 || r.bottom > window.innerHeight - 140){
+        if (userScrollingTimer) return;
+        userScrollingTimer = setTimeout(()=>{
+          curP.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          userScrollingTimer = null;
+        }, 100);
+      }
+    }
+  }
+
+  let scrollTimer = null;
+  window.addEventListener('scroll', ()=>{
+    autoFollow = false;
+    clearTimeout(scrollTimer);
+    scrollTimer = setTimeout(()=>{ autoFollow = true; }, 5000);
+  }, { passive: true });
+
+  // 点击段落：跳到该时间并播放
+  paras.forEach(p => { p.style.cursor = 'pointer'; });
+  paras.forEach(p => {
+    p.addEventListener('click', ()=>{
+      audio.currentTime = parseFloat(p.dataset.t);
+      if (audio.paused) audio.play();
+      autoFollow = true;
+    });
   });
+
+  // 章节当前高亮（h2.chapter-h）
+  const chapterHs = Array.from(document.querySelectorAll('h2.chapter-h'));
+  const tocLinks  = Array.from(document.querySelectorAll('.sidebar-toc a[href^="#"], .drawer a[href^="#"]'));
+  const topLinks  = tocLinks.filter(a => a.closest('.sidebar-toc'));
+  function activeChapter(){
+    const offset = window.innerHeight * 0.4;
+    let activeId = null;
+    for (const h of chapterHs){
+      const r = h.getBoundingClientRect();
+      if (r.top < offset && r.bottom > 0) activeId = h.id;
+    }
+    if (!activeId) return;
+    topLinks.forEach(a => a.classList.toggle('active', a.getAttribute('href') === '#' + activeId));
+  }
+  window.addEventListener('scroll', activeChapter, { passive: true });
+  activeChapter();
+
+  // 字号
+  const SIZES  = ['','size-sm','size-lg'];
+  let sizeIdx  = 0;
+  $('size-btn').addEventListener('click', () => {
+    document.body.classList.remove('size-sm','size-lg');
+    sizeIdx = (sizeIdx + 1) % SIZES.length;
+    if (SIZES[sizeIdx]) document.body.classList.add(SIZES[sizeIdx]);
+    try{localStorage.setItem('shanSize', SIZES[sizeIdx]);}catch(e){}
+  });
+  try{
+    const s = localStorage.getItem('shanSize');
+    if (s){ document.body.classList.remove('size-sm','size-lg'); document.body.classList.add(s); sizeIdx = SIZES.indexOf(s); }
+  }catch(e){}
+
+  // 主题
+  $('theme-btn').addEventListener('click', () => {
+    document.documentElement.classList.toggle('dark');
+    try{localStorage.setItem('shanDark', document.documentElement.classList.contains('dark')?'1':'0');}catch(e){}
+  });
+  try{
+    if (localStorage.getItem('shanDark') === '1') document.documentElement.classList.add('dark');
+  }catch(e){}
+
+  // 速度
+  speedSel.addEventListener('change', () => { audio.playbackRate = parseFloat(speedSel.value); });
+  audio.playbackRate = parseFloat(speedSel.value);
+
+  // 移动端抽屉
+  function openDrawer(){ drawer.classList.add('open'); scrim.classList.add('open'); }
+  function closeDrawer(){ drawer.classList.remove('open'); scrim.classList.remove('open'); }
+  menuBtn.addEventListener('click', openDrawer);
+  scrim.addEventListener('click', closeDrawer);
+  drawer.querySelectorAll('a').forEach(a => a.addEventListener('click', closeDrawer));
+
+  // 键盘快捷键
+  document.addEventListener('keydown', e => {
+    if (e.target.matches('input,textarea,select')) return;
+    if (e.code === 'Space'){ e.preventDefault(); toggle(); }
+    else if (e.code === 'ArrowLeft') { audio.currentTime = Math.max(0, audio.currentTime - 5); }
+    else if (e.code === 'ArrowRight'){ audio.currentTime = Math.min((audio.duration||0)+1, audio.currentTime + 5); }
+  });
+
+  // Hero CTA 触发播放
+  const heroCta = document.querySelector('.hero .play-cta');
+  if (heroCta) heroCta.addEventListener('click', e => {
+    e.preventDefault();
+    if (audio.paused) audio.play();
+    else audio.currentTime = 0;
+  });
+
+  setPlayingIcon(false);
 })();
 </script>
 </body>

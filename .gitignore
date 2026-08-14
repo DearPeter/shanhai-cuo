@@ -1,3 +1,6 @@
 .DS_Store
 build_html.py
 audio/ch1_jingying.mp3
+audio/ch1_jingying.mp3
+audio/ch1_ts.json
+shot.py
